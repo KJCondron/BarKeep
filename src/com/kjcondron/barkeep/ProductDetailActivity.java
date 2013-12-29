@@ -27,6 +27,7 @@ public class ProductDetailActivity extends Activity {
 	    Spinner spinner = (Spinner) findViewById(R.id.spinner1);
 	    
 	    String[] choices = {"Whisky","Rum","Gin","Vodka","Tequilla"};
+	    
 	    ArrayAdapter<CharSequence> adapter = 
 	    		new ArrayAdapter<CharSequence>(
 	    				this,
@@ -43,17 +44,29 @@ public class ProductDetailActivity extends Activity {
 	    DBHelper db = new DBHelper(this);
 	    Cursor c = db.getBrands(message);
 	    
-	    String[] cols = c.getColumnNames();
+	    ArrayAdapter<CharSequence> brandArrayAdapter = 
+	    		new ArrayAdapter<CharSequence>(
+	    				this,
+	    				android.R.layout.simple_spinner_item);
+	    
+	    c.moveToFirst();
+	    do{
+	    	String s = c.getString(1);
+	    	brandArrayAdapter.add(s);
+	    }while(c.moveToNext());
+	    
+	    String[] names = c.getColumnNames();
+	    int i = c.getCount();
 	    
 	    SimpleCursorAdapter brandAdapter = new SimpleCursorAdapter(
 	    		this, 
-	    		android.R.layout.simple_spinner_item,
+	    		android.R.layout.simple_spinner_dropdown_item,
 	    		c, 
 	    		new String[]{ "Brand" },
-	    		new int[] { R.id.textView3 },
-	    		CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER );
+	    		new int[] { android.R.id.text1 },
+	    		CursorAdapter.NO_SELECTION );
 	    
-	    brandAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+	//    brandAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 	    brands.setAdapter(brandAdapter);
 	    
 	    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
