@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">BarKeep</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="edit_message">Enter A Message</string>
+    <string name="button_send">Send</string>
+    <string name="title_activity_display_message">My Message</string>
+    <string name="title_activity_add">Add Product</string>
+    <string name="title_activity_use">Use Product</string>
+    <string name="title_activity_remove">Remove Product</string>
+    <string name="title_activity_product_detail">ProductDetailActivity</string>
+
+</resources>
