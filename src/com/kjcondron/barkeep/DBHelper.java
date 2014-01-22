@@ -22,7 +22,7 @@ public class DBHelper extends SQLiteAssetHelper  {
 		SQLiteDatabase db = getReadableDatabase();
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
 
-        String [] sqlSelect = {"0 _id", "Brand"};
+        String [] sqlSelect = {"0 _id", "brand"};
        
         qb.setTables(tableName);
         Cursor c = qb.query(db, sqlSelect, null, null,

@@ -62,7 +62,7 @@ public class ProductDetailActivity extends Activity {
 	    		this, 
 	    		android.R.layout.simple_spinner_dropdown_item,
 	    		c, 
-	    		new String[]{ "Brand" },
+	    		new String[]{ "brand" },
 	    		new int[] { android.R.id.text1 },
 	    		CursorAdapter.NO_SELECTION );
 	    
