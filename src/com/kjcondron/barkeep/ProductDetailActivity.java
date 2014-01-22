@@ -27,7 +27,7 @@ public class ProductDetailActivity extends Activity {
 	    Intent intent = getIntent();
 	    String type = intent.getStringExtra(AddActivity.PRODUCT_TYPE);
 
-	    Spinner typeSpinner = (Spinner) findViewById(R.id.spinner1);
+	    Spinner typeSpinner = (Spinner) findViewById(R.id.spinInventory);
 	    
 	    String[] choices = {"Whisky","Rum","Gin","Vodka","Tequila"};
 	    
@@ -51,7 +51,7 @@ public class ProductDetailActivity extends Activity {
 	protected void onStart()
 	{
 		super.onStart();
-		Spinner typeSpinner = (Spinner) findViewById(R.id.spinner1);
+		Spinner typeSpinner = (Spinner) findViewById(R.id.spinInventory);
 	    
 		typeSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
 	    @Override
@@ -74,7 +74,7 @@ public class ProductDetailActivity extends Activity {
 		    public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
 		    	if(selectedItemView != null)
 		    	{
-			    	Spinner typeSpinner = (Spinner) findViewById(R.id.spinner1);
+			    	Spinner typeSpinner = (Spinner) findViewById(R.id.spinInventory);
 			    	String type = typeSpinner.getSelectedItem().toString();
 			    	TextView tv = (TextView) selectedItemView;
 			    	String brand = tv.getText().toString();
@@ -95,7 +95,7 @@ public class ProductDetailActivity extends Activity {
 		    @Override
 		    public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
 		    	
-		    	Spinner typeSpinner = (Spinner) findViewById(R.id.spinner1);
+		    	Spinner typeSpinner = (Spinner) findViewById(R.id.spinInventory);
 		    	Spinner bs = (Spinner) findViewById(R.id.brandSpinner);
 		    	
 		    	if(selectedItemView != null && 
@@ -176,7 +176,31 @@ public class ProductDetailActivity extends Activity {
 	    size.setAdapter(brandAdapter);
 	    
 	}
-
+	
+	public void commitItem(View view)
+	{
+		DBHelper db = new DBHelper(this);
+		Spinner typeSpinner = (Spinner) findViewById(R.id.spinInventory);
+		
+		db.writeInventory(
+				1,
+				typeSpinner.getSelectedItem().toString(),
+				getSpinnerValue(R.id.brandSpinner, "brand"),
+				getSpinnerValue(R.id.prodSpinner, "product_name"),
+				getSpinnerValue(R.id.sizeSpinner, "size"),
+				1.0);
+		
+		Intent intent = new Intent(this, MainActivity.class);
+    	startActivity(intent);
+    	
+	}
+	
+	private String getSpinnerValue(int id, String columnName)
+	{
+		Spinner spin = (Spinner) findViewById(id);
+    	Cursor c = (Cursor)spin.getSelectedItem();
+	    return c.getString(c.getColumnIndex(columnName));
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

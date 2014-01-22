@@ -12,25 +12,25 @@
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/spinner1"
+        android:layout_alignTop="@+id/spinInventory"
         android:layout_marginRight="46dp"
         android:layout_marginTop="22dp"
-        android:layout_toLeftOf="@+id/spinner1"
+        android:layout_toLeftOf="@+id/spinInventory"
         android:text="Type" />
 
     <Spinner
-        android:id="@+id/spinner1"
+        android:id="@+id/spinInventory"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/textCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/textView1"
-        android:layout_below="@+id/spinner1"
+        android:layout_below="@+id/spinInventory"
         android:layout_marginTop="18dp"
         android:text="Brand" />
 
@@ -38,24 +38,14 @@
         android:id="@+id/brandSpinner"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/spinner1"
-        android:layout_alignTop="@+id/textView2" />
-
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignRight="@+id/brandSpinner"
-        android:layout_marginBottom="34dp"
-        android:layout_marginRight="38dp"
-        android:text="TextView" />
+        android:layout_alignLeft="@+id/spinInventory"
+        android:layout_alignTop="@+id/textCount" />
 
     <TextView
         android:id="@+id/TextView01"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textView2"
+        android:layout_alignLeft="@+id/textCount"
         android:layout_alignTop="@+id/prodSpinner"
         android:layout_marginTop="22dp"
         android:text="Product" />
@@ -82,5 +72,15 @@
         android:layout_alignTop="@+id/sizeSpinner"
         android:layout_marginTop="22dp"
         android:text="Size" />
+
+    <Button
+        android:id="@+id/commitItem"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/sizeSpinner"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="49dp"
+        android:onClick="commitItem"
+        android:text="Add" />
 
 </RelativeLayout>

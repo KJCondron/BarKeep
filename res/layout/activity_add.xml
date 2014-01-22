@@ -9,7 +9,7 @@
     tools:context=".AddActivity" >
 
     <Button
-        android:id="@+id/button1"
+        android:id="@+id/commitItem"
         android:layout_width="150dip"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -23,7 +23,7 @@
         android:id="@+id/button3"
         android:layout_width="150dip"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/button1"
+        android:layout_alignLeft="@+id/commitItem"
         android:layout_below="@+id/button2"
         android:onClick="addRum"
         android:text="Rum" />
@@ -33,7 +33,7 @@
         android:layout_width="150dip"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/button3"
-        android:layout_below="@+id/button1"
+        android:layout_below="@+id/commitItem"
         android:onClick="addGin"
         android:text="Gin" />
 

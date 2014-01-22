@@ -9,8 +9,27 @@
     tools:context=".UseActivity" >
 
     <TextView
+        android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="USE" />
+
+    <Spinner
+        android:id="@+id/spinInventory"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView1"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="48dp" />
+
+    <TextView
+        android:id="@+id/textCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/spinInventory"
+        android:layout_marginLeft="58dp"
+        android:layout_marginTop="100dp"
+        android:layout_toRightOf="@+id/textView1"
+        android:text="TextView" />
 
 </RelativeLayout>

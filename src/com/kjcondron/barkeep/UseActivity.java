@@ -4,8 +4,13 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.support.v4.app.NavUtils;
+import android.support.v4.widget.CursorAdapter;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.annotation.TargetApi;
+import android.database.Cursor;
 import android.os.Build;
 
 public class UseActivity extends Activity {
@@ -16,6 +21,7 @@ public class UseActivity extends Activity {
 		setContentView(R.layout.activity_use);
 		// Show the Up button in the action bar.
 		setupActionBar();
+		setupInvSpinner();
 	}
 
 	/**
@@ -50,6 +56,31 @@ public class UseActivity extends Activity {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+	
+	protected void setupInvSpinner()
+	{
+		int barID=1;
+		Spinner inv = (Spinner) findViewById(R.id.spinInventory);
+		TextView tv = (TextView) findViewById(R.id.textCount);
+	    
+	    DBHelper db = new DBHelper(this);
+	    Cursor c = db.getInventory(barID);
+	    c.moveToFirst();
+	    SimpleCursorAdapter invAdapter = new SimpleCursorAdapter(
+	    		this, 
+	    		android.R.layout.simple_spinner_dropdown_item,
+	    		c, 
+	    		new String[]{ "product_name" },
+	    		new int[] { android.R.id.text1 },
+	    		CursorAdapter.NO_SELECTION );
+	    
+	    int count = c.getCount();
+	    String str = "Items=" + count;
+	    tv.setText(str);
+	    
+	    inv.setAdapter(invAdapter);
+	    
 	}
 
 }
