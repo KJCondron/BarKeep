@@ -7,6 +7,9 @@ import android.database.Cursor;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.Menu;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ListView;
@@ -22,9 +25,9 @@ public class ProductDetailActivity extends Activity {
 		setContentView(R.layout.activity_product_detail);
 		// Get the message from the intent
 	    Intent intent = getIntent();
-	    String message = intent.getStringExtra(AddActivity.PRODUCT_TYPE);
+	    String product = intent.getStringExtra(AddActivity.PRODUCT_TYPE);
 
-	    Spinner spinner = (Spinner) findViewById(R.id.spinner1);
+	    Spinner typeSpinner = (Spinner) findViewById(R.id.spinner1);
 	    
 	    String[] choices = {"Whisky","Rum","Gin","Vodka","Tequila"};
 	    
@@ -33,16 +36,50 @@ public class ProductDetailActivity extends Activity {
 	    				this,
 	    				android.R.layout.simple_spinner_item);
 	    
-	    adapter.add(message);
+	    adapter.add(product);
 	    for(String ci : choices) {
-	    	if(ci != message)
+	    	if(ci != product)
 	    		adapter.add(ci);
 	    }
 	    
-	    Spinner brands = (Spinner) findViewById(R.id.spinner2);
+	    setupBrandSpinner(product);
+	    
+	    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+	    typeSpinner.setAdapter(adapter);
+	}
+	
+	protected void onStart()
+	{
+		super.onStart();
+		Spinner typeSpinner = (Spinner) findViewById(R.id.spinner1);
+	    
+		typeSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+	    @Override
+	    public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+	        // your code here
+	    	TextView tv = (TextView) selectedItemView;
+	    	String type = tv.getText().toString();
+	    	TextView txt = (TextView) findViewById(R.id.textView3);	
+		    txt.setText(type);
+		    
+		    setupBrandSpinner(type);
+		    
+	    }
+
+	    @Override
+	    public void onNothingSelected(AdapterView<?> parentView) {
+	        // your code here
+	    }
+
+		});
+	}
+		
+	protected void setupBrandSpinner(String product)
+	{
+		Spinner brands = (Spinner) findViewById(R.id.spinner2);
 	    
 	    DBHelper db = new DBHelper(this);
-	    Cursor c = db.getBrands(message);
+	    Cursor c = db.getBrands(product);
 	    
 	    ArrayAdapter<CharSequence> brandArrayAdapter = 
 	    		new ArrayAdapter<CharSequence>(
@@ -66,11 +103,8 @@ public class ProductDetailActivity extends Activity {
 	    		new int[] { android.R.id.text1 },
 	    		CursorAdapter.NO_SELECTION );
 	    
-	//    brandAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 	    brands.setAdapter(brandAdapter);
 	    
-	    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-	    spinner.setAdapter(adapter);
 	}
 
 	@Override
