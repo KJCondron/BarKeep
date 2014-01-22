@@ -42,7 +42,9 @@ public class DBHelper extends SQLiteAssetHelper  {
 	public Cursor getProducts( String tableName, String brand )
 	{
 		SQLiteDatabase db = getReadableDatabase();
-        String sql = "select * from " + tableName + " where brand='" + brand +"'";
+		String sql = "select _id, product_name from " + 
+        		tableName + " where brand=\"" + brand +
+        		"\" group by product_name";
         Cursor c = db.rawQuery(sql, null);
         
         c.moveToFirst();
@@ -52,8 +54,8 @@ public class DBHelper extends SQLiteAssetHelper  {
 	public Cursor getSizes( String tableName, String brand, String product )
 	{
 		SQLiteDatabase db = getReadableDatabase();
-        String sql = "select size from " + tableName + " where brand='" + brand +
-        		"and product_name='" + product +"'";
+        String sql = "select _id, size from " + tableName + " where brand=\"" +
+        		brand + "\" and product_name=\"" + product +"\" group by size";
         Cursor c = db.rawQuery(sql, null);
         c.moveToFirst();
         return c;
