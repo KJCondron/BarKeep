@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.view.Menu;
 import android.view.View;
+import android.widget.TextView;
 
 public class MainActivity extends Activity {
 	
@@ -39,4 +40,27 @@ public class MainActivity extends Activity {
     	startMyActvity(RemoveActivity.class);
     }
     
+    public void startScan(View view){
+    	IntentIntegrator.initiateScan(this);
+    }
+    
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    	switch(requestCode) {
+    		case IntentIntegrator.REQUEST_CODE: {
+    			if (resultCode != RESULT_CANCELED) {
+    				IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+    				if (scanResult != null) {
+    					String upc = scanResult.getContents();
+    	 
+    					//put whatever you want to do with the code here
+    					TextView tv = new TextView(this);
+    					tv.setText(upc);
+    					setContentView(tv);
+    	 
+    				}
+    			}
+    			break;
+    		}
+    	}
+    }    
 }

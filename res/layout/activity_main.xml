@@ -41,4 +41,14 @@
         android:onClick="startUse"
         android:text="Use" />
 
+    <Button
+        android:id="@+id/button4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/button3"
+        android:layout_marginBottom="67dp"
+        android:layout_toLeftOf="@+id/button3"
+        android:onClick="startScan"
+        android:text="Add From Barcode" />
+
 </RelativeLayout>
