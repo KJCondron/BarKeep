@@ -66,7 +66,7 @@ public class AddActivity extends Activity {
 	public void addRum(View view) { addProduct("Rum"); }
 	public void addVodka(View view) { addProduct("Vodka"); }
 	public void addGin(View view) { addProduct("Gin"); }
-	public void addTequilla(View view) { addProduct("Tequilla"); }
+	public void addTequila(View view) { addProduct("Tequila"); }
 	public void addOther(View view) { addProduct("Other"); }
 	public void addLiqueur(View view) { addProduct("Liqueur"); }
 

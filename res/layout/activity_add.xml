@@ -52,8 +52,8 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/button4"
         android:layout_below="@+id/button4"
-        android:onClick="addTequilla"
-        android:text="Tequilla" />
+        android:onClick="addTequila"
+        android:text="Tequila" />
 
     <Button
         android:id="@+id/button6"

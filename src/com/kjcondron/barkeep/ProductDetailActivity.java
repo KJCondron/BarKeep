@@ -26,7 +26,7 @@ public class ProductDetailActivity extends Activity {
 
 	    Spinner spinner = (Spinner) findViewById(R.id.spinner1);
 	    
-	    String[] choices = {"Whisky","Rum","Gin","Vodka","Tequilla"};
+	    String[] choices = {"Whisky","Rum","Gin","Vodka","Tequila"};
 	    
 	    ArrayAdapter<CharSequence> adapter = 
 	    		new ArrayAdapter<CharSequence>(
