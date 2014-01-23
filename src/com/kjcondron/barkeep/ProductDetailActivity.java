@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
@@ -18,6 +19,13 @@ import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
 public class ProductDetailActivity extends Activity {
+	
+	public final static String ADD_TO_DB = "com.kjcondron.barkeep.ADD_TO_DB";
+	public final static String UPC = "com.kjcondron.barkeep.UPC";
+	
+	private Boolean mAddToDB = false;
+	private Boolean mHaveUPC = false;
+	private Cursor mUpcCursor;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -26,26 +34,41 @@ public class ProductDetailActivity extends Activity {
 		// Get the message from the intent
 	    Intent intent = getIntent();
 	    String type = intent.getStringExtra(AddActivity.PRODUCT_TYPE);
-
-	    Spinner typeSpinner = (Spinner) findViewById(R.id.spinInventory);
 	    
-	    String[] choices = {"Whisky","Rum","Gin","Vodka","Tequila"};
+	    mAddToDB = intent.getBooleanExtra(ADD_TO_DB, false);
+	    mHaveUPC = intent.hasExtra(UPC);
 	    
 	    ArrayAdapter<CharSequence> adapter = 
 	    		new ArrayAdapter<CharSequence>(
 	    				this,
 	    				android.R.layout.simple_spinner_item);
 	    
-	    adapter.add(type);
-	    for(String ci : choices) {
-	    	if(ci != type)
-	    		adapter.add(ci);
-	    }
+	    Spinner typeSpinner = (Spinner) findViewById(R.id.spinInventory);
 	    
-	    setupBrandSpinner(type);
+	    if(mHaveUPC)
+	    {
+	    	String upc = intent.getStringExtra(UPC);
+	    	Pair<String, Cursor> upcDeets = new DBHelper(this).getFromUPC(upc); 
+	    	mUpcCursor = upcDeets.second;
+	    	adapter.add(upcDeets.first);
+	    }
+	    else
+	    {    
+		    String[] choices = {"Whisky","Rum","Gin","Vodka","Tequila"};
+		        
+		    adapter.add(type);
+		    for(String ci : choices) {
+		    	if(ci != type)
+		    		adapter.add(ci);
+		    }
+		    
+		    setupBrandSpinner(type);
+		       
+	    }
 	    
 	    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 	    typeSpinner.setAdapter(adapter);
+	    
 	}
 	
 	protected void onStart()
@@ -190,9 +213,7 @@ public class ProductDetailActivity extends Activity {
 				getSpinnerValue(R.id.sizeSpinner, "size"),
 				1.0);
 		
-		Intent intent = new Intent(this, MainActivity.class);
-    	startActivity(intent);
-    	
+		finish();    	
 	}
 	
 	private String getSpinnerValue(int id, String columnName)

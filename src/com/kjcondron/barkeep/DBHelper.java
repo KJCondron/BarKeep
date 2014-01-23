@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
+import android.util.Pair;
 
 public class DBHelper extends SQLiteAssetHelper  {
 	
@@ -69,6 +70,33 @@ public class DBHelper extends SQLiteAssetHelper  {
         Cursor c = db.rawQuery(sql, null);
         c.moveToFirst();
         return c;
+	}
+	
+	public Pair<String, Cursor > getFromUPC( String upc )
+	{
+		SQLiteDatabase db = getReadableDatabase();
+		String tblSql = "SELECT * FROM sqlite_master WHERE type='table' and not name='Inventory'";
+		Cursor c = db.rawQuery(tblSql, null);
+		c.moveToFirst();
+		String sql = "select * from " +
+				c.getString(c.getColumnIndex("name"))  + 
+				" where upc='" + upc + "'";
+		
+		Cursor c2 = db.rawQuery(sql, null);
+		if(c2.getCount() < 1) {
+			while(c.moveToNext())
+			{
+				sql = "select * from " +
+						c.getString(c.getColumnIndex("name"))  + 
+						" where upc='" + upc + "'";
+				
+				c2 = db.rawQuery(sql, null);
+				if(c2.getCount() > 0)
+					return new Pair<String, Cursor>(c.getString(c.getColumnIndex("name")), c2);
+			}
+		}
+      
+        return new Pair<String, Cursor>(c.getString(c.getColumnIndex("name")), c2);
 	}
 	
 	public void writeInventory(

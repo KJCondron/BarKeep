@@ -3,6 +3,7 @@ package com.kjcondron.barkeep;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
 import android.view.Menu;
 import android.view.View;
 import android.widget.TextView;
@@ -53,10 +54,16 @@ public class MainActivity extends Activity {
     					String upc = scanResult.getContents();
     	 
     					//put whatever you want to do with the code here
-    					TextView tv = new TextView(this);
-    					tv.setText(upc);
-    					setContentView(tv);
-    	 
+    					DBHelper db = new DBHelper(this);
+    					Cursor c = db.getFromUPC(upc).second;
+    					Intent intent = new Intent(this, ProductDetailActivity.class);
+    					intent.putExtra(
+								ProductDetailActivity.UPC,
+								upc);
+    					if( c.getCount() == 0 )
+    						intent.putExtra(ProductDetailActivity.ADD_TO_DB, true);	
+    					
+    					startActivity(intent);
     				}
     			}
     			break;

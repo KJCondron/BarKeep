@@ -21,6 +21,12 @@ public class AddActivity extends Activity {
 		// Show the Up button in the action bar.
 		setupActionBar();
 	}
+	
+	// if add subscreen should die after a product is added 
+	/*protected void onRestart() {
+		super.onResume();
+		finish();
+	}*/
 
 	/**
 	 * Set up the {@link android.app.ActionBar}, if the API is available.
