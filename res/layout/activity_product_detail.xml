@@ -1,86 +1,85 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".ProductDetailActivity" >
-
+    
     <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
+        android:id="@+id/prodDetail_textViewType"
+        android:layout_width="55dp"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/spinInventory"
-        android:layout_marginRight="46dp"
-        android:layout_marginTop="22dp"
-        android:layout_toLeftOf="@+id/spinInventory"
         android:text="Type" />
 
     <Spinner
-        android:id="@+id/spinInventory"
-        android:layout_width="200dp"
+        android:id="@+id/prodDetail_typeSpinner"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true" />
-
+        android:layout_toRightOf="@+id/prodDetail_textViewType" />
+   
     <TextView
-        android:id="@+id/textCount"
-        android:layout_width="wrap_content"
+        android:id="@+id/prodDetail_textViewBrand"
+        android:layout_width="55dp"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textView1"
-        android:layout_below="@+id/spinInventory"
-        android:layout_marginTop="18dp"
-        android:text="Brand" />
-
+        android:text="Brand"
+        android:layout_below="@+id/prodDetail_typeSpinner" />
+  
     <Spinner
-        android:id="@+id/brandSpinner"
-        android:layout_width="200dp"
+        android:id="@+id/prodDetail_brandSpinner"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/spinInventory"
-        android:layout_alignTop="@+id/textCount" />
-
+        android:layout_toRightOf="@+id/prodDetail_textViewBrand"
+        android:layout_below="@+id/prodDetail_typeSpinner"
+         />
+    
+     <TextView
+        android:id="@+id/prodDetail_textViewProd"
+        android:layout_width="55dp"
+        android:layout_height="wrap_content"
+        android:text="Product"
+        android:layout_below="@+id/prodDetail_brandSpinner" />
+  
+     <Spinner
+        android:id="@+id/prodDetail_prodSpinner"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/prodDetail_textViewProd"
+        android:layout_below="@+id/prodDetail_brandSpinner" /> 
+    
     <TextView
-        android:id="@+id/TextView01"
-        android:layout_width="wrap_content"
+        android:id="@+id/prodDetail_textViewSize"
+        android:layout_width="55dp"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textCount"
-        android:layout_alignTop="@+id/prodSpinner"
-        android:layout_marginTop="22dp"
-        android:text="Product" />
-
+        android:text="Size"
+        android:layout_below="@+id/prodDetail_prodSpinner" />
+    
     <Spinner
-        android:id="@+id/prodSpinner"
-        android:layout_width="200dp"
+        android:id="@+id/prodDetail_sizeSpinner"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/brandSpinner"
-        android:layout_below="@+id/brandSpinner" />
-
-    <Spinner
-        android:id="@+id/sizeSpinner"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/prodSpinner"
-        android:layout_below="@+id/prodSpinner" />
-
-    <TextView
-        android:id="@+id/TextView02"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/TextView01"
-        android:layout_alignTop="@+id/sizeSpinner"
-        android:layout_marginTop="22dp"
-        android:text="Size" />
-
+        android:layout_toRightOf="@+id/prodDetail_textViewSize"
+        android:layout_below="@+id/prodDetail_prodSpinner" />
+    
     <Button
-        android:id="@+id/commitItem"
-        android:layout_width="wrap_content"
+        android:id="@+id/prodDetail_commitItem"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/sizeSpinner"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="49dp"
+        android:layout_marginBottom="22dp"
         android:onClick="commitItem"
-        android:text="Add" />
+        android:text="Add"
+        android:layout_below="@+id/prodDetail_sizeSpinner" />
+    
+    <Button
+        android:id="@+id/prodDetail_commitItemAddToProducts"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="22dp"
+        android:onClick="commitItemAddToProducts"
+        android:text="Add + Update"
+        android:layout_below="@+id/prodDetail_sizeSpinner" />
 
 </RelativeLayout>

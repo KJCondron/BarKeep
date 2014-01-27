@@ -3,15 +3,12 @@ package com.kjcondron.barkeep;
 import java.io.File;
 import java.io.FileOutputStream;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.database.Cursor;
 import android.view.Menu;
 import android.view.View;
-import android.widget.TextView;
 
 public class MainActivity extends Activity {
 	
@@ -103,14 +100,13 @@ public class MainActivity extends Activity {
     					{
 	    					String upc = scanResult.getContents();
 	    	 
-	    					//put whatever you want to do with the code here
-	    					DBHelper db = new DBHelper(this);
-	    					Cursor c = db.getFromUPC(upc).second;
 	    					Intent intent = new Intent(this, ProductDetailActivity.class);
 	    					intent.putExtra(
 									ProductDetailActivity.UPC,
 									upc);
-	    					if( c.getCount() == 0 )
+	    					
+	    					DBHelper db = new DBHelper(this);
+	    					if( !db.UPCExsits(upc) )
 	    						intent.putExtra(ProductDetailActivity.ADD_TO_DB, true);	
 	    					
 	    					startActivity(intent);

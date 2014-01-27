@@ -1,19 +1,18 @@
 package com.kjcondron.barkeep;
 
-import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
-import android.database.sqlite.SQLiteQueryBuilder;
 import android.util.Pair;
+
+import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 
 public class DBHelper extends SQLiteAssetHelper  {
 	
 	private static final String DATABASE_NAME = "barkeep";
 	private static final int DATABASE_VERSION = 1;
+	public static final String NOT_FOUND = "NOT_FOUND";
 
 	public DBHelper(Context ctxt) {
 		super(ctxt, DATABASE_NAME, null, DATABASE_VERSION);
@@ -23,21 +22,12 @@ public class DBHelper extends SQLiteAssetHelper  {
 	{
 		try{
 			SQLiteDatabase db = getReadableDatabase();
-	        //SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
-	
-	        //String [] sqlSelect = {"0 _id", "brand"};
-	       
-	        //qb.setTables(tableName);
 	        
 	        // hacky sql to return [_id, brand] columns
 	        String sql = "select distinct _id, brand from " + tableName + " Group by brand Order by brand";
 	        
 	        Cursor c2 = db.rawQuery(sql, null);
 	        
-	        //Cursor c = qb.query(db, sqlSelect, null, null,
-	        //                null, null, null);
-	
-	        //c.moveToFirst();
 	        c2.moveToFirst();
 	        return c2;
 		}
@@ -100,42 +90,49 @@ public class DBHelper extends SQLiteAssetHelper  {
 		}
 	}
 	
-	public Pair<String, Cursor > getFromUPC( String upc ) throws Exception
+	public Pair< String, Cursor > getFromUPC( String upc ) throws Exception
 	{
 		// look up product by UPC in global product tables
 		try
 		{
 			SQLiteDatabase db = getReadableDatabase();
-			// data is currently stored in multiple tables.
-			// all the ones not called inventory. fix that maybe.
-			String tblSql = "SELECT * FROM sqlite_master WHERE type='table' and not name='Inventory'";
-			Cursor c = db.rawQuery(tblSql, null);
-			c.moveToFirst();
-			String sql = "select * from " +
-					c.getString(c.getColumnIndex("name"))  + 
-					" where upc='" + upc + "'";
 			
-			Cursor c2 = db.rawQuery(sql, null);
-			if(c2.getCount() < 1) {
-				while(c.moveToNext())
-				{
-					sql = "select * from " +
-							c.getString(c.getColumnIndex("name"))  + 
-							" where upc='" + upc + "'";
-					
-					c2 = db.rawQuery(sql, null);
-					if(c2.getCount() > 0)
-						return new Pair<String, Cursor>(c.getString(c.getColumnIndex("name")), c2);
-				}
+			// data is currently stored in multiple tables.
+			// and the have to match the categories hard coded. 
+			// to-do fix that maybe.
+			
+			String [] cats = ProductDetailActivity.categories;
+			for(String c : cats)
+			{
+				String sql = "select * from " +
+						c + 
+						" where upc='" + upc + "'";
+				
+				Cursor c2 = db.rawQuery(sql, null);
+				if(c2.getCount() > 0)
+					return new Pair<String, Cursor>(c, c2);
 			}
-	      
-	        return new Pair<String, Cursor>(c.getString(c.getColumnIndex("name")), c2);
 		}
 		catch(Exception e)
 		{
-			MainActivity.log_exception(e, "getFroUPC");
+			MainActivity.log_exception(e, "getFromUPC");
 			throw e;
 		}
+		
+		throw new Exception(NOT_FOUND);
+	}
+	
+	// helper here as we don't have idiomatic use of Option[..]
+	// to keep this code together
+	public Boolean UPCExsits( String upc ) throws Exception
+	{
+		try{
+			getFromUPC(upc);
+		}
+		catch(Exception e){
+			return false;
+		}
+		return true;
 	}
 	
 	public void writeInventory(
