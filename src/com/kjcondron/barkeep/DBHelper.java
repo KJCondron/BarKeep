@@ -19,84 +19,123 @@ public class DBHelper extends SQLiteAssetHelper  {
 		super(ctxt, DATABASE_NAME, null, DATABASE_VERSION);
 	}
 	
-	public Cursor getBrands( String tableName )
+	public Cursor getBrands( String tableName ) throws Exception
 	{
-		SQLiteDatabase db = getReadableDatabase();
-        //SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
-
-        //String [] sqlSelect = {"0 _id", "brand"};
-       
-        //qb.setTables(tableName);
-        
-        // hacky sql to return [_id, brand] columns
-        String sql = "select distinct _id, brand from " + tableName + " Group by brand Order by brand";
-        
-        Cursor c2 = db.rawQuery(sql, null);
-        
-        //Cursor c = qb.query(db, sqlSelect, null, null,
-        //                null, null, null);
-
-        //c.moveToFirst();
-        c2.moveToFirst();
-        return c2;
+		try{
+			SQLiteDatabase db = getReadableDatabase();
+	        //SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+	
+	        //String [] sqlSelect = {"0 _id", "brand"};
+	       
+	        //qb.setTables(tableName);
+	        
+	        // hacky sql to return [_id, brand] columns
+	        String sql = "select distinct _id, brand from " + tableName + " Group by brand Order by brand";
+	        
+	        Cursor c2 = db.rawQuery(sql, null);
+	        
+	        //Cursor c = qb.query(db, sqlSelect, null, null,
+	        //                null, null, null);
+	
+	        //c.moveToFirst();
+	        c2.moveToFirst();
+	        return c2;
+		}
+		catch(Exception e)
+		{
+			MainActivity.log_exception(e, "getBrands");
+			throw e;
+		}
 	}
 			
-	public Cursor getProducts( String tableName, String brand )
+	public Cursor getProducts( String tableName, String brand ) throws Exception
 	{
-		SQLiteDatabase db = getReadableDatabase();
-		String sql = "select _id, product_name from " + 
-        		tableName + " where brand=\"" + brand +
-        		"\" group by product_name";
-        Cursor c = db.rawQuery(sql, null);
-        
-        c.moveToFirst();
-        return c;
-	}
-	
-	public Cursor getSizes( String tableName, String brand, String product )
-	{
-		SQLiteDatabase db = getReadableDatabase();
-        String sql = "select _id, size from " + tableName + " where brand=\"" +
-        		brand + "\" and product_name=\"" + product +"\" group by size";
-        Cursor c = db.rawQuery(sql, null);
-        c.moveToFirst();
-        return c;
-	}
-	
-	public Cursor getInventory( int barID )
-	{
-		SQLiteDatabase db = getReadableDatabase();
-        String sql = "select * from Inventory where bar_id=" + barID;
-        Cursor c = db.rawQuery(sql, null);
-        c.moveToFirst();
-        return c;
-	}
-	
-	public Pair<String, Cursor > getFromUPC( String upc )
-	{
-		SQLiteDatabase db = getReadableDatabase();
-		String tblSql = "SELECT * FROM sqlite_master WHERE type='table' and not name='Inventory'";
-		Cursor c = db.rawQuery(tblSql, null);
-		c.moveToFirst();
-		String sql = "select * from " +
-				c.getString(c.getColumnIndex("name"))  + 
-				" where upc='" + upc + "'";
-		
-		Cursor c2 = db.rawQuery(sql, null);
-		if(c2.getCount() < 1) {
-			while(c.moveToNext())
-			{
-				sql = "select * from " +
-						c.getString(c.getColumnIndex("name"))  + 
-						" where upc='" + upc + "'";
-				
-				c2 = db.rawQuery(sql, null);
-				if(c2.getCount() > 0)
-					return new Pair<String, Cursor>(c.getString(c.getColumnIndex("name")), c2);
-			}
+		try{
+			SQLiteDatabase db = getReadableDatabase();
+			String sql = "select _id, product_name from " + 
+		    		tableName + " where brand=\"" + brand +
+		    		"\" group by product_name";
+		    Cursor c = db.rawQuery(sql, null);
+		    
+		    c.moveToFirst();
+		    return c;
 		}
-      
-        return new Pair<String, Cursor>(c.getString(c.getColumnIndex("name")), c2);
+		catch(Exception e)
+		{
+			MainActivity.log_exception(e, "getProducts");
+			throw e;
+		}
+	}
+	
+	public Cursor getSizes( String tableName, String brand, String product ) throws Exception
+	{
+		try{
+			SQLiteDatabase db = getReadableDatabase();
+	        String sql = "select _id, size from " + tableName + " where brand=\"" +
+	        		brand + "\" and product_name=\"" + product +"\" group by size";
+	        Cursor c = db.rawQuery(sql, null);
+	        c.moveToFirst();
+	        return c;
+		}
+		catch(Exception e)
+		{
+			MainActivity.log_exception(e, "getSizes");
+			throw e;
+		}
+	}
+	
+	public Cursor getInventory( int barID ) throws Exception
+	{
+		try{
+			SQLiteDatabase db = getReadableDatabase();
+	        String sql = "select * from Inventory where bar_id=" + barID;
+	        Cursor c = db.rawQuery(sql, null);
+	        c.moveToFirst();
+	        return c;
+		}
+		catch(Exception e)
+		{
+			MainActivity.log_exception(e, "getInvenory");
+			throw e;
+		}
+	}
+	
+	public Pair<String, Cursor > getFromUPC( String upc ) throws Exception
+	{
+		// look up product by UPC in global product tables
+		try
+		{
+			SQLiteDatabase db = getReadableDatabase();
+			// data is currently stored in multiple tables.
+			// all the ones not called inventory. fix that maybe.
+			String tblSql = "SELECT * FROM sqlite_master WHERE type='table' and not name='Inventory'";
+			Cursor c = db.rawQuery(tblSql, null);
+			c.moveToFirst();
+			String sql = "select * from " +
+					c.getString(c.getColumnIndex("name"))  + 
+					" where upc='" + upc + "'";
+			
+			Cursor c2 = db.rawQuery(sql, null);
+			if(c2.getCount() < 1) {
+				while(c.moveToNext())
+				{
+					sql = "select * from " +
+							c.getString(c.getColumnIndex("name"))  + 
+							" where upc='" + upc + "'";
+					
+					c2 = db.rawQuery(sql, null);
+					if(c2.getCount() > 0)
+						return new Pair<String, Cursor>(c.getString(c.getColumnIndex("name")), c2);
+				}
+			}
+	      
+	        return new Pair<String, Cursor>(c.getString(c.getColumnIndex("name")), c2);
+		}
+		catch(Exception e)
+		{
+			MainActivity.log_exception(e, "getFroUPC");
+			throw e;
+		}
 	}
 	
 	public void writeInventory(

@@ -60,26 +60,33 @@ public class UseActivity extends Activity {
 	
 	protected void setupInvSpinner()
 	{
-		int barID=1;
-		Spinner inv = (Spinner) findViewById(R.id.spinInventory);
-		TextView tv = (TextView) findViewById(R.id.textCount);
-	    
-	    DBHelper db = new DBHelper(this);
-	    Cursor c = db.getInventory(barID);
-	    c.moveToFirst();
-	    SimpleCursorAdapter invAdapter = new SimpleCursorAdapter(
-	    		this, 
-	    		android.R.layout.simple_spinner_dropdown_item,
-	    		c, 
-	    		new String[]{ "product_name" },
-	    		new int[] { android.R.id.text1 },
-	    		CursorAdapter.NO_SELECTION );
-	    
-	    int count = c.getCount();
-	    String str = "Items=" + count;
-	    tv.setText(str);
-	    
-	    inv.setAdapter(invAdapter);
+		try
+		{
+			int barID=1;
+			Spinner inv = (Spinner) findViewById(R.id.spinInventory);
+			TextView tv = (TextView) findViewById(R.id.textCount);
+		    
+		    DBHelper db = new DBHelper(this);
+		    Cursor c = db.getInventory(barID);
+		    c.moveToFirst();
+		    SimpleCursorAdapter invAdapter = new SimpleCursorAdapter(
+		    		this, 
+		    		android.R.layout.simple_spinner_dropdown_item,
+		    		c, 
+		    		new String[]{ "product_name" },
+		    		new int[] { android.R.id.text1 },
+		    		CursorAdapter.NO_SELECTION );
+		    
+		    int count = c.getCount();
+		    String str = "Items=" + count;
+		    tv.setText(str);
+		    
+		    inv.setAdapter(invAdapter);
+		}
+		catch(Exception e)
+		{
+			MainActivity.log_exception(e, "setupInvSpinner");
+		}
 	    
 	}
 

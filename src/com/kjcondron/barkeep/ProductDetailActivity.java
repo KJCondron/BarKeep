@@ -47,10 +47,19 @@ public class ProductDetailActivity extends Activity {
 	    
 	    if(mHaveUPC)
 	    {
-	    	String upc = intent.getStringExtra(UPC);
-	    	Pair<String, Cursor> upcDeets = new DBHelper(this).getFromUPC(upc); 
-	    	mUpcCursor = upcDeets.second;
-	    	adapter.add(upcDeets.first);
+	    	try{
+	    		// this should never fail as we have already got it from the db in another
+	    		// activity. chould we pass the details in the intent? 
+		    	String upc = intent.getStringExtra(UPC);
+		    	Pair<String, Cursor> upcDeets = new DBHelper(this).getFromUPC(upc); 
+		    	mUpcCursor = upcDeets.second;
+		    	adapter.add(upcDeets.first);
+	    	}
+	    	catch(Exception e)
+	    	{
+	    		MainActivity.log_exception(e, "ProductDetailActivity.onCreate");
+	    	}
+	    	
 	    }
 	    else
 	    {    
@@ -145,58 +154,85 @@ public class ProductDetailActivity extends Activity {
 		
 	protected void setupBrandSpinner(String product)
 	{
-		Spinner brands = (Spinner) findViewById(R.id.brandSpinner);
-	    
-	    DBHelper db = new DBHelper(this);
-	    Cursor c = db.getBrands(product);
-	         
-	    SimpleCursorAdapter brandAdapter = new SimpleCursorAdapter(
-	    		this, 
-	    		android.R.layout.simple_spinner_dropdown_item,
-	    		c, 
-	    		new String[]{ "brand" },
-	    		new int[] { android.R.id.text1 },
-	    		CursorAdapter.NO_SELECTION );
-	    
-	    brands.setAdapter(brandAdapter);
+		try
+		{
+			Spinner brands = (Spinner) findViewById(R.id.brandSpinner);
+			
+			if(mHaveUPC)
+			{
+				
+			}
+			else
+			{
+			    DBHelper db = new DBHelper(this);
+			    Cursor c = db.getBrands(product);
+			         
+			    SimpleCursorAdapter brandAdapter = new SimpleCursorAdapter(
+			    		this, 
+			    		android.R.layout.simple_spinner_dropdown_item,
+			    		c, 
+			    		new String[]{ "brand" },
+			    		new int[] { android.R.id.text1 },
+			    		CursorAdapter.NO_SELECTION );
+			    
+			    brands.setAdapter(brandAdapter);
+			}
+		}
+		catch(Exception e)
+		{
+			MainActivity.log_exception(e, "setupBrandSpinner");
+		}
 	    
 	}
 	
 	protected void setupProdSpinner(String type, String brand)
 	{
-		Spinner prods = (Spinner) findViewById(R.id.prodSpinner);
-	    
-	    DBHelper db = new DBHelper(this);
-	    Cursor c = db.getProducts(type, brand);
-	    	    	    
-	    SimpleCursorAdapter brandAdapter = new SimpleCursorAdapter(
-	    		this, 
-	    		android.R.layout.simple_spinner_dropdown_item,
-	    		c, 
-	    		new String[]{ "product_name" },
-	    		new int[] { android.R.id.text1 },
-	    		CursorAdapter.NO_SELECTION ); 
-	    
-	    prods.setAdapter(brandAdapter);
+		try
+		{
+			Spinner prods = (Spinner) findViewById(R.id.prodSpinner);
+		    
+		    DBHelper db = new DBHelper(this);
+		    Cursor c = db.getProducts(type, brand);
+		    	    	    
+		    SimpleCursorAdapter brandAdapter = new SimpleCursorAdapter(
+		    		this, 
+		    		android.R.layout.simple_spinner_dropdown_item,
+		    		c, 
+		    		new String[]{ "product_name" },
+		    		new int[] { android.R.id.text1 },
+		    		CursorAdapter.NO_SELECTION ); 
+		    
+		    prods.setAdapter(brandAdapter);
+		}
+		catch(Exception e){
+			MainActivity.log_exception(e, "setupProdSpinner");
+		}
 	    
 	}
 	
 	protected void setupSizeSpinner(String type, String brand, String product)
 	{
-		Spinner size = (Spinner) findViewById(R.id.sizeSpinner);
-	    
-	    DBHelper db = new DBHelper(this);
-	    Cursor c = db.getSizes(type, brand, product);
-	    	    	    
-	    SimpleCursorAdapter brandAdapter = new SimpleCursorAdapter(
-	    		this, 
-	    		android.R.layout.simple_spinner_dropdown_item,
-	    		c, 
-	    		new String[]{ "size" },
-	    		new int[] { android.R.id.text1 },
-	    		CursorAdapter.NO_SELECTION ); 
-	    
-	    size.setAdapter(brandAdapter);
+		try
+		{
+			Spinner size = (Spinner) findViewById(R.id.sizeSpinner);
+		    
+		    DBHelper db = new DBHelper(this);
+		    Cursor c = db.getSizes(type, brand, product);
+		    	    	    
+		    SimpleCursorAdapter brandAdapter = new SimpleCursorAdapter(
+		    		this, 
+		    		android.R.layout.simple_spinner_dropdown_item,
+		    		c, 
+		    		new String[]{ "size" },
+		    		new int[] { android.R.id.text1 },
+		    		CursorAdapter.NO_SELECTION ); 
+		    
+		    size.setAdapter(brandAdapter);
+		}
+		catch(Exception e)
+		{
+			MainActivity.log_exception(e, "setupSizeSpinner");
+		}
 	    
 	}
 	
