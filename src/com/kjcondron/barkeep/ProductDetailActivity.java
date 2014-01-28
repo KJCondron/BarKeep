@@ -231,7 +231,7 @@ public class ProductDetailActivity extends Activity {
 			Spinner brands = (Spinner) findViewById(R.id.prodDetail_brandSpinner);
 			
 		    DBHelper db = new DBHelper(this);
-		    Cursor c = db.getBrands(product);
+		    Cursor c = db.getBrands(product, mAddToDB);
 		    
 		    setupSpinner(c, "brand", brands);
 		}
@@ -241,51 +241,7 @@ public class ProductDetailActivity extends Activity {
 		}
 	    
 	}
-	
-	protected void setupSpinner(Cursor details, String columnName, Spinner spinner)
-	{
-		try
-		{
-		    SimpleCursorAdapter brandAdapter = new SimpleCursorAdapter(
-		    		this, 
-		    		android.R.layout.simple_spinner_dropdown_item,
-		    		details, 
-		    		new String[]{ columnName },
-		    		new int[] { android.R.id.text1 },
-		    		CursorAdapter.NO_SELECTION );
-		    
-		    spinner.setAdapter(brandAdapter);
-		}
 		
-		catch(Exception e)
-		{
-			MainActivity.log_exception(e, "setupSpinner");
-		}
-	    
-	}
-	
-	/*protected void setupAutoCompleteText(Cursor details, String columnName, AutoCompleteTextView actv)
-	{
-		try
-		{
-		    SimpleCursorAdapter brandAdapter = new SimpleCursorAdapter(
-		    		this, 
-		    		android.R.layout.simple_dropdown_item_1line,
-		    		details, 
-		    		new String[]{ columnName },
-		    		new int[] { android.R.id.text1 },
-		    		CursorAdapter.NO_SELECTION );
-		    
-		    actv.setAdapter(brandAdapter);
-		}
-		
-		catch(Exception e)
-		{
-			MainActivity.log_exception(e, "setupAutoCompleteText");
-		}
-	    
-	}*/
-	
 	protected void setupProdSpinner(String type, String brand)
 	{
 		try
@@ -293,7 +249,7 @@ public class ProductDetailActivity extends Activity {
 			Spinner prods = (Spinner) findViewById(R.id.prodDetail_prodSpinner);
 		    
 		    DBHelper db = new DBHelper(this);
-		    Cursor c = db.getProducts(type, brand);
+		    Cursor c = db.getProducts(type, brand, mAddToDB);
 		    
 		    setupSpinner(c, "product_name", prods);
 		    	    	    
@@ -311,13 +267,35 @@ public class ProductDetailActivity extends Activity {
 			Spinner size = (Spinner) findViewById(R.id.prodDetail_sizeSpinner);
 		    
 		    DBHelper db = new DBHelper(this);
-		    Cursor c = db.getSizes(type, brand, product);
+		    Cursor c = db.getSizes(type, brand, product, mAddToDB);
 		    	    	    
 		    setupSpinner(c, "size", size);
 		}
 		catch(Exception e)
 		{
 			MainActivity.log_exception(e, "setupSizeSpinner");
+		}
+	    
+	}
+	
+	protected void setupSpinner(Cursor details, String columnName, Spinner spinner)
+	{
+		try
+		{
+		    SimpleCursorAdapter adapter = new SimpleCursorAdapter(
+		    		this, 
+		    		android.R.layout.simple_spinner_dropdown_item,
+		    		details, 
+		    		new String[]{ columnName },
+		    		new int[] { android.R.id.text1 },
+		    		CursorAdapter.NO_SELECTION );
+		    
+		    spinner.setAdapter(adapter);
+		}
+		
+		catch(Exception e)
+		{
+			MainActivity.log_exception(e, "setupSpinner");
 		}
 	    
 	}
