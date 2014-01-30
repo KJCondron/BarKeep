@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteCursor;
 import android.os.Bundle;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
@@ -21,6 +22,7 @@ public class ProductDetailActivity extends Activity {
 	public final static String ADD_TO_DB = "com.kjcondron.barkeep.ADD_TO_DB";
 	public final static String UPC = "com.kjcondron.barkeep.UPC";
 	public final static String[] categories = {"Whisky","Rum","Gin","Vodka","Tequila"};
+	public final static Integer TYPENAMECOL = 1;
 	
 	private Boolean mAddToDB = false;
 	private Boolean mHaveUPC = false;
@@ -123,6 +125,13 @@ public class ProductDetailActivity extends Activity {
 	    
 	}
 	
+	private String getType()
+	{
+		Spinner typeSpinner = (Spinner) findViewById(R.id.prodDetail_typeSpinner);
+		Cursor ctype = (Cursor)typeSpinner.getSelectedItem();
+    	return ctype.getString(TYPENAMECOL);
+	}
+	
 	protected void setupListeners()
 	{
 		Spinner typeSpinner = (Spinner) findViewById(R.id.prodDetail_typeSpinner);
@@ -148,11 +157,9 @@ public class ProductDetailActivity extends Activity {
 		    public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
 		    	if(selectedItemView != null)
 		    	{
-			    	Spinner typeSpinner = (Spinner) findViewById(R.id.prodDetail_typeSpinner);
-			    	String type = typeSpinner.getSelectedItem().toString();
 			    	TextView tv = (TextView) selectedItemView;
 			    	String brand = tv.getText().toString();
-			    	setupProdSpinner(type, brand);
+			    	setupProdSpinner(getType(), brand);
 		    	}
 		    }
 
@@ -176,12 +183,11 @@ public class ProductDetailActivity extends Activity {
 		    			typeSpinner.getSelectedItem() != null &&
 		    			bs.getSelectedItem() != null)
 		    	{
-			    	String type = typeSpinner.getSelectedItem().toString();
 			    	Cursor c = (Cursor)bs.getSelectedItem();
 			    	String brand = c.getString(c.getColumnIndex("brand"));
 			    	TextView tv = (TextView) selectedItemView;
 			    	String prod= tv.getText().toString();
-			    	setupSizeSpinner(type, brand, prod);
+			    	setupSizeSpinner(getType(), brand, prod);
 		    	}
 		    }
 
@@ -200,26 +206,34 @@ public class ProductDetailActivity extends Activity {
 		{
 			Spinner typeSpinner = (Spinner) findViewById(R.id.prodDetail_typeSpinner);
 
-			ArrayAdapter<CharSequence> adapter = 
-		    		new ArrayAdapter<CharSequence>(
-		    				this,
-		    				android.R.layout.simple_spinner_item);
-	        
-			// add current type first and then other types so user can change
-			// without going back a screen
-		    adapter.add(type);
-		    for(String ci : categories) {
-		    	if(!ci.equals(type))
-		    		adapter.add(ci);
-		    }
+			DBHelper db = new DBHelper(this);
+		    Cursor c = db.getTypes();
 		    
-		    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		    SimpleCursorAdapter adapter = new SimpleCursorAdapter(
+		    		this, 
+		    		android.R.layout.simple_spinner_dropdown_item,
+		    		c, 
+		    		new String[]{ "product_type" },
+		    		new int[] { android.R.id.text1 },
+		    		CursorAdapter.NO_SELECTION );
+		 
 		    typeSpinner.setAdapter(adapter);
+		    
+		    for(int i=0; i<adapter.getCount(); ++i)
+		    {
+		    	SQLiteCursor cur = (SQLiteCursor)adapter.getItem(i);
+		    	String val = cur.getString(TYPENAMECOL);
+		    	if(val.equals(type))
+		    	{
+		    		typeSpinner.setSelection(i);
+		    		break;
+		    	}
+		    }
 		    
 		}
 		catch(Exception e)
 		{
-			MainActivity.log_exception(e, "setupBrandSpinner");
+			MainActivity.log_exception(e, "setupTypeSpinner");
 		}
 	    
 	}
@@ -303,11 +317,10 @@ public class ProductDetailActivity extends Activity {
 	public void commitItem(View view)
 	{
 		DBHelper db = new DBHelper(this);
-		Spinner typeSpinner = (Spinner) findViewById(R.id.prodDetail_typeSpinner);
 		
 		db.writeInventory(
 				1,
-				typeSpinner.getSelectedItem().toString(),
+				getType(),
 				getSpinnerValue(R.id.prodDetail_brandSpinner, "brand"),
 				getSpinnerValue(R.id.prodDetail_prodSpinner, "product_name"),
 				getSpinnerValue(R.id.prodDetail_sizeSpinner, "size"),
@@ -319,11 +332,10 @@ public class ProductDetailActivity extends Activity {
 	public void commitItemAddToProducts(View view) throws Exception
 	{
 		DBHelper db = new DBHelper(this);
-		Spinner typeSpinner = (Spinner) findViewById(R.id.prodDetail_typeSpinner);
 		
 		db.writeInventory(
 				1,
-				typeSpinner.getSelectedItem().toString(),
+				getType(),
 				getSpinnerValue(R.id.prodDetail_brandSpinner, "brand"),
 				getSpinnerValue(R.id.prodDetail_prodSpinner, "product_name"),
 				getSpinnerValue(R.id.prodDetail_sizeSpinner, "size"),

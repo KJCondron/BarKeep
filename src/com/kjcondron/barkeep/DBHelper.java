@@ -28,15 +28,37 @@ public class DBHelper extends SQLiteAssetHelper  {
 		return getBrands(tableName,false);
 	}
 	
-	public Cursor getBrands( String tableName, Boolean includeOther ) throws Exception
+	public Cursor getTypes() throws Exception
+	{
+		try{
+			SQLiteDatabase db = getReadableDatabase();
+	        
+			String sql ="select * from Types";
+	        
+	        Cursor c2 = db.rawQuery(sql, null);
+	   
+	        c2.moveToFirst();
+	        return c2;
+		}
+		catch(Exception e)
+		{
+			MainActivity.log_exception(e, "getTypes");
+			throw e;
+		}
+	}
+	
+	public Cursor getBrands( String type, Boolean includeOther ) throws Exception
 	{
 		try{
 			SQLiteDatabase db = getReadableDatabase();
 	        
 			String optionSql = includeOther ? makeOptional("brand") : "";
 			
-			// hacky sql to return [_id, brand] columns
-	        String sql = optionSql + "select distinct _id, brand from " + tableName + " Group by brand Order by brand";
+	        //String sql = optionSql + "select distinct _id, brand from products" + tableName + " Group by brand Order by brand";
+	        
+	        String sql = optionSql + "select _id, brand from vProducts " +
+	        		"where product_type=\"" + type + 
+	        		"\" group by brand";
 	        
 	        Cursor c2 = db.rawQuery(sql, null);
 	   
@@ -55,15 +77,17 @@ public class DBHelper extends SQLiteAssetHelper  {
 		return getProducts(tableName, brand, false);
 	}
 	
-	public Cursor getProducts( String tableName, String brand, Boolean includeOther  ) throws Exception
+	public Cursor getProducts( String type, String brand, Boolean includeOther  ) throws Exception
 	{
 		try{
 			SQLiteDatabase db = getReadableDatabase();
 			
 			String optionSql = includeOther ? makeOptional("product_name") : "";
-			String sql =  optionSql + "select _id, product_name from " + 
-		    		tableName + " where brand=\"" + brand +
-		    		"\" group by product_name";
+			
+	        String sql = optionSql + "select _id, product_name from vProducts " +
+	        		"where product_type=\"" + type + 
+	        		"\" and brand=\"" + brand + "\" group by product_name";
+	        
 		    Cursor c = db.rawQuery(sql, null);
 		    
 		    c.moveToFirst();
@@ -81,13 +105,16 @@ public class DBHelper extends SQLiteAssetHelper  {
 		return getSizes(tableName, brand, product, false);
 	}
 	
-	public Cursor getSizes( String tableName, String brand, String product, Boolean includeOther  ) throws Exception
+	public Cursor getSizes( String type, String brand, String product, Boolean includeOther  ) throws Exception
 	{
 		try{
 			SQLiteDatabase db = getReadableDatabase();
 			String optionSql = includeOther ? makeOptional("size") : "";
-	        String sql =  optionSql + "select _id, size from " + tableName + " where brand=\"" +
-	        		brand + "\" and product_name=\"" + product +"\" group by size";
+	        String sql =  optionSql + "select _id, size from vProducts " +
+					"where product_type=\"" + type + 
+					"\" and brand=\"" + brand + "\" and product_name=\"" + product + 
+					"\" group by size";
+	        
 	        Cursor c = db.rawQuery(sql, null);
 	        c.moveToFirst();
 	        return c;
@@ -175,10 +202,11 @@ public class DBHelper extends SQLiteAssetHelper  {
 		c.moveToFirst();
 		Integer rowID = c.getInt(0)+1;
 		
-		String sql = "select * from " + type + " where brand=\"" +
-        		brand + "\" and product_name=\"" + name + "\" and size=\"" +
+		String sql = "select * from vProducts where product_type =\"" + type +
+				"" +
+				"\" and brand=\"" + brand + "\" and product_name=\"" + name + "\" and size=\"" +
 				size + "\"";
-        
+		
 		Cursor item = dbw.rawQuery(sql, null);
 		item.moveToFirst();
 		String upc = item.getString(item.getColumnIndex("upc"));
