@@ -6,10 +6,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.support.v4.app.NavUtils;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
@@ -33,7 +36,9 @@ public class UseActivity extends Activity {
 	
 	protected void setupView(Boolean gv)
 	{
-		AbsListView v = gv ? getGridView() : getListView(); 
+		AbsListView v = gv ? 
+				getLGView(R.layout.layout_inventory_grid_view, R.id.gridview) :
+				getLGView(R.layout.layout_inventory_list_view, R.id.listview); 
 		try
 		{
 			SimpleCursorAdapter invAdapter = getInvetory();
@@ -46,18 +51,19 @@ public class UseActivity extends Activity {
 	}
 	
 	
-	protected AbsListView getListView()
+	protected AbsListView getLGView(int layoutId, int viewID)
 	{
-		setContentView(R.layout.layout_inventory_list_view);
-		return (AbsListView) findViewById(R.id.listview);
+		setContentView(layoutId);
+		AbsListView view =  (AbsListView) findViewById(viewID);
+		view.setOnItemClickListener(new OnItemClickListener() {
+	        public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+	            Toast.makeText(getApplicationContext(), "" + position, Toast.LENGTH_SHORT).show();
+	        }
+		});
+	        
+	    return view;
 	}
 	
-	protected AbsListView getGridView()
-	{
-		setContentView(R.layout.layout_inventory_grid_view);
-		return (AbsListView) findViewById(R.id.gridview);
-	}
-
 	/**
 	 * Set up the {@link android.app.ActionBar}, if the API is available.
 	 */
