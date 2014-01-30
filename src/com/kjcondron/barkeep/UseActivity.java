@@ -4,6 +4,10 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AbsListView;
+import android.widget.GridView;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.support.v4.app.NavUtils;
@@ -15,13 +19,43 @@ import android.os.Build;
 
 public class UseActivity extends Activity {
 
+	private Boolean gridView = false;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_use);
+		
 		// Show the Up button in the action bar.
 		setupActionBar();
-		setupInvSpinner();
+		
+		setupView(gridView);
+				
+	}
+	
+	protected void setupView(Boolean gv)
+	{
+		AbsListView v = gv ? getGridView() : getListView(); 
+		try
+		{
+			SimpleCursorAdapter invAdapter = getInvetory();
+			v.setAdapter(invAdapter);
+		}
+		catch(Exception e)
+		{
+			
+		}
+	}
+	
+	
+	protected AbsListView getListView()
+	{
+		setContentView(R.layout.layout_inventory_list_view);
+		return (AbsListView) findViewById(R.id.listview);
+	}
+	
+	protected AbsListView getGridView()
+	{
+		setContentView(R.layout.layout_inventory_grid_view);
+		return (AbsListView) findViewById(R.id.gridview);
 	}
 
 	/**
@@ -54,40 +88,32 @@ public class UseActivity extends Activity {
 			//
 			NavUtils.navigateUpFromSameTask(this);
 			return true;
+		case R.id.viewactionitem:
+			gridView = !gridView;
+			setupView(gridView);
+			item.setTitle(gridView ? "List View" : "Grid View");
+			return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}
 	
-	protected void setupInvSpinner()
+	protected SimpleCursorAdapter getInvetory() throws Exception
 	{
-		try
-		{
-			int barID=1;
-			Spinner inv = (Spinner) findViewById(R.id.spinInventory);
-			TextView tv = (TextView) findViewById(R.id.textCount);
-		    
-		    DBHelper db = new DBHelper(this);
-		    Cursor c = db.getInventory(barID);
-		    c.moveToFirst();
-		    SimpleCursorAdapter invAdapter = new SimpleCursorAdapter(
-		    		this, 
-		    		android.R.layout.simple_spinner_dropdown_item,
-		    		c, 
-		    		new String[]{ "product_name" },
-		    		new int[] { android.R.id.text1 },
-		    		CursorAdapter.NO_SELECTION );
-		    
-		    int count = c.getCount();
-		    String str = "Items=" + count;
-		    tv.setText(str);
-		    
-		    inv.setAdapter(invAdapter);
-		}
-		catch(Exception e)
-		{
-			MainActivity.log_exception(e, "setupInvSpinner");
-		}
+		int barID=1;
+		String[] coulmnNames = new String[]{ "brand", "product_name", "size", "amt" };
+	    DBHelper db = new DBHelper(this);
+	    Cursor c = db.getInventory(barID);
+	    c.moveToFirst();
+	    SimpleCursorAdapter invAdapter = new SimpleCursorAdapter(
+	    		this, 
+	    		R.layout.layout_inventory_item,
+	    		c, 
+	    		coulmnNames,
+	    		new int[] { R.id.textView1, R.id.textView2,R.id.textView3,R.id.textView4 },
+	    		CursorAdapter.NO_SELECTION );
 	    
+	    return invAdapter;
 	}
+	
 
 }
