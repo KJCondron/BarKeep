@@ -2,6 +2,7 @@ package com.kjcondron.barkeep;
 
 import java.text.MessageFormat;
 
+import android.R.bool;
 import android.R.string;
 import android.content.ContentValues;
 import android.content.Context;
@@ -32,6 +33,16 @@ public class DBHelper extends SQLiteAssetHelper  {
 	public Cursor getBrands( String tableName) throws Exception
 	{
 		return getBrands(tableName,false);
+	}
+	
+	public Boolean haveBar()
+	{
+		SQLiteDatabase db = getReadableDatabase();
+        
+		String sql = "select * from Inventory";    
+        Cursor c = db.rawQuery(sql, null);
+        c.moveToFirst();
+        return c.getCount() > 0;
 	}
 	
 	public Cursor getTypes() throws Exception
@@ -310,5 +321,11 @@ public class DBHelper extends SQLiteAssetHelper  {
 		
 	    SQLiteDatabase dbw = getWritableDatabase();
 		dbw.insert("ShoppingList", "", values);
+	}
+	
+	public void removeFromShopping(int iid)
+	{
+		SQLiteDatabase dbw = getWritableDatabase();
+		dbw.delete("ShoppingList", "_id=" + iid, null);
 	}
 }

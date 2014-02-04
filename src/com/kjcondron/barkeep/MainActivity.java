@@ -58,7 +58,17 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.layout_splash);
+        try{
+        	wait(2000);
+        	}
+        catch(Exception e) {}
+        
+        if(new DBHelper(this).haveBar())
+        	startMyActvity(UseActivity.class);
+        
+        finish();
+        
     }
 
 
@@ -90,40 +100,4 @@ public class MainActivity extends Activity {
     	startMyActvity(ShopActivity.class);
     }
     
-    public void startScan(View view){
-    	IntentIntegrator.initiateScan(this);
     }
-    
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    	switch(requestCode) {
-    		case IntentIntegrator.REQUEST_CODE: {
-    			if (resultCode != RESULT_CANCELED) {
-    				IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-    				if (scanResult != null) {
-    					try
-    					{
-	    					String upc = scanResult.getContents();
-	    	 
-	    					Intent intent = new Intent(this, ProductDetailActivity.class);
-	    					intent.putExtra(
-									ProductDetailActivity.UPC,
-									upc);
-	    					
-	    					DBHelper db = new DBHelper(this);
-	    					if( !db.UPCExsits(upc) )
-	    						intent.putExtra(ProductDetailActivity.ADD_TO_DB, true);	
-	    					
-	    					startActivity(intent);
-    					}
-    					catch(Exception e)
-    					{
-    						MainActivity.log_exception(e, "MainActivity.onActivityResult");
-    						// do nothing we are showing main activity
-    					}
-    				}
-    			}
-    			break;
-    		}
-    	}
-    }    
-}

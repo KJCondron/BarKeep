@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
@@ -33,6 +34,13 @@ public class UseActivity extends Activity {
 
 		// Show the Up button in the action bar.
 		setupActionBar();
+		setupView(gridView);
+	}
+	
+	@Override
+	protected void onResume()
+	{
+		super.onResume();
 		setupView(gridView);
 	}
 	
@@ -120,10 +128,18 @@ public class UseActivity extends Activity {
 			//
 			NavUtils.navigateUpFromSameTask(this);
 			return true;
-		case R.id.viewactionitem:
+		case R.id.menugridview:
 			gridView = !gridView;
 			setupView(gridView);
 			item.setTitle(gridView ? "List View" : "Grid View");
+			return true;
+		case R.id.menuadd:
+			Intent aIntent = new Intent(this, AddActivity.class);
+	    	startActivity(aIntent);
+			return true;
+		case R.id.menushopping:
+			Intent sIntent = new Intent(this, ShopActivity.class);
+	    	startActivity(sIntent);
 			return true;
 		}
 		return super.onOptionsItemSelected(item);

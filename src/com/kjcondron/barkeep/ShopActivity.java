@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
@@ -29,11 +30,21 @@ public class ShopActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mdb = new DBHelper(this);
+		mbuilder = new AlertDialog.Builder(this); 
+
 
 		// Show the Up button in the action bar.
 		setupActionBar();
 		setupView(gridView);
 	}
+	
+	@Override
+	protected void onResume()
+	{
+		super.onResume();
+		setupView(gridView);
+	}
+
 	
 	protected void setupView(Boolean gv)
 	{
@@ -56,8 +67,35 @@ public class ShopActivity extends Activity {
 	{
 		setContentView(layoutId);
 		AbsListView view =  (AbsListView) findViewById(viewID);
+		view.setOnItemClickListener(new OnItemClickListener() {
+	        
+			public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+	            ListView lv = (ListView)parent;
+	            SimpleCursorAdapter Cu = (SimpleCursorAdapter)lv.getAdapter();
+	            final Integer iid = Cu.getCursor().getInt(Cu.getCursor().getColumnIndex("_id"));
+	            	DialogInterface.OnClickListener dcl = new DialogInterface.OnClickListener() {
+
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							switch(which){
+								case DialogInterface.BUTTON_POSITIVE:
+									mdb.removeFromShopping(iid);
+									setupView(gridView);
+									break;
+								case DialogInterface.BUTTON_NEGATIVE:
+							}
+						
+						}
+					};
+					
+					mbuilder.setMessage("Remove?").setPositiveButton("Yes", dcl).setNegativeButton("No", dcl).show();
+	                setupView(gridView);
+	        }
+		});
+	        
 	    return view;
 	}
+
 	
 	/**
 	 * Set up the {@link android.app.ActionBar}, if the API is available.
@@ -89,7 +127,7 @@ public class ShopActivity extends Activity {
 			//
 			NavUtils.navigateUpFromSameTask(this);
 			return true;
-		case R.id.viewactionitem:
+		case R.id.menugridview:
 			gridView = !gridView;
 			setupView(gridView);
 			item.setTitle(gridView ? "List View" : "Grid View");

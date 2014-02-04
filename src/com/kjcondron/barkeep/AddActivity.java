@@ -58,6 +58,11 @@ public class AddActivity extends Activity {
 			//
 			NavUtils.navigateUpFromSameTask(this);
 			return true;
+		case R.id.menu_barcode:
+			startScan(item.getActionView());
+			finish();
+			return true;
+			
 		}
 		return super.onOptionsItemSelected(item);
 	}
@@ -66,6 +71,7 @@ public class AddActivity extends Activity {
 		Intent intent = new Intent(this, ProductDetailActivity.class);
 	    intent.putExtra(PRODUCT_TYPE, s);
 	    startActivity(intent);
+	    finish();
 	}
 	
 	public void addWhisky(View view) { addProduct("Whisky"); }
@@ -75,5 +81,43 @@ public class AddActivity extends Activity {
 	public void addTequila(View view) { addProduct("Tequila"); }
 	public void addOther(View view) { addProduct("Other"); }
 	public void addLiqueur(View view) { addProduct("Liqueur"); }
+	
+	public void startScan(View view){
+    	IntentIntegrator.initiateScan(this);
+    }
+    
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    	switch(requestCode) {
+    		case IntentIntegrator.REQUEST_CODE: {
+    			if (resultCode != RESULT_CANCELED) {
+    				IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+    				if (scanResult != null) {
+    					try
+    					{
+	    					String upc = scanResult.getContents();
+	    	 
+	    					Intent intent = new Intent(this, ProductDetailActivity.class);
+	    					intent.putExtra(
+									ProductDetailActivity.UPC,
+									upc);
+	    					
+	    					DBHelper db = new DBHelper(this);
+	    					if( !db.UPCExsits(upc) )
+	    						intent.putExtra(ProductDetailActivity.ADD_TO_DB, true);	
+	    					
+	    					startActivity(intent);
+    					}
+    					catch(Exception e)
+    					{
+    						MainActivity.log_exception(e, "MainActivity.onActivityResult");
+    						// do nothing we are showing main activity
+    					}
+    				}
+    			}
+    			break;
+    		}
+    	}
+    }    
+
 
 }
