@@ -11,5 +11,6 @@
     <string name="title_activity_use">Use Product</string>
     <string name="title_activity_remove">Remove Product</string>
     <string name="title_activity_product_detail">ProductDetailActivity</string>
+    <string name="title_activity_shop">ShopActivity</string>
 
 </resources>

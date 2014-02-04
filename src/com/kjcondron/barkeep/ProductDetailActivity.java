@@ -22,7 +22,9 @@ public class ProductDetailActivity extends Activity {
 	public final static String ADD_TO_DB = "com.kjcondron.barkeep.ADD_TO_DB";
 	public final static String UPC = "com.kjcondron.barkeep.UPC";
 	public final static String[] categories = {"Whisky","Rum","Gin","Vodka","Tequila"};
+	public final static Integer IDCOL = 0;
 	public final static Integer TYPENAMECOL = 1;
+	public final static Integer BARID = 1;
 	
 	private Boolean mAddToDB = false;
 	private Boolean mHaveUPC = false;
@@ -62,15 +64,16 @@ public class ProductDetailActivity extends Activity {
 	    	
 	    	// pair because due to (bad) db design type is the name of the 
 	    	// table not in the cursor (to-do could be fixed with a view)
-	    	Pair<String, Cursor> upcDeets = new DBHelper(this).getFromUPC(upc); 
-	    	adapter.add(upcDeets.first);
+	    	Cursor upcDeets = new DBHelper(this).getFromUPC(upc); 
+	    	//adapter.add(upcDeets.first);
 	    	
 	    	adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		    typeSpinner.setAdapter(adapter);
 		    
-		    setupSpinner(upcDeets.second, "brand", brandSpinner);
-		    setupSpinner(upcDeets.second, "product_name", productSpinner);
-		    setupSpinner(upcDeets.second, "size", sizeSpinner);
+		    setupSpinner(upcDeets, "product_type", typeSpinner); 
+		    setupSpinner(upcDeets, "brand", brandSpinner);
+		    setupSpinner(upcDeets, "product_name", productSpinner);
+		    setupSpinner(upcDeets, "size", sizeSpinner);
 		    
 		    findViewById(R.id.prodDetail_commitItem).setVisibility(View.VISIBLE);
 			findViewById(R.id.prodDetail_commitItemAddToProducts).setVisibility(View.INVISIBLE);
@@ -130,6 +133,13 @@ public class ProductDetailActivity extends Activity {
 		Spinner typeSpinner = (Spinner) findViewById(R.id.prodDetail_typeSpinner);
 		Cursor ctype = (Cursor)typeSpinner.getSelectedItem();
     	return ctype.getString(TYPENAMECOL);
+	}
+	
+	private Integer getTypeId()
+	{
+		Spinner typeSpinner = (Spinner) findViewById(R.id.prodDetail_typeSpinner);
+		Cursor ctype = (Cursor)typeSpinner.getSelectedItem();
+    	return ctype.getInt(IDCOL);
 	}
 	
 	protected void setupListeners()
@@ -319,11 +329,8 @@ public class ProductDetailActivity extends Activity {
 		DBHelper db = new DBHelper(this);
 		
 		db.writeInventory(
-				1,
-				getType(),
-				getSpinnerValue(R.id.prodDetail_brandSpinner, "brand"),
-				getSpinnerValue(R.id.prodDetail_prodSpinner, "product_name"),
-				getSpinnerValue(R.id.prodDetail_sizeSpinner, "size"),
+				BARID,
+				getSpinnerValueInt(R.id.prodDetail_prodSpinner, "_id"),
 				1.0);
 		
 		finish();    	
@@ -334,16 +341,19 @@ public class ProductDetailActivity extends Activity {
 		DBHelper db = new DBHelper(this);
 		
 		db.writeInventory(
-				1,
-				getType(),
+				BARID,
+				getSpinnerValueInt(R.id.prodDetail_prodSpinner, "_id"),
+				1.0);
+		
+		String upc = getIntent().getStringExtra(UPC);
+		db.writeProduct(
+				getTypeId(),
 				getSpinnerValue(R.id.prodDetail_brandSpinner, "brand"),
 				getSpinnerValue(R.id.prodDetail_prodSpinner, "product_name"),
 				getSpinnerValue(R.id.prodDetail_sizeSpinner, "size"),
-				1.0);
+				upc);
 		
 		finish();
-		
-		throw new Exception("Fix this it should write to teh product db");
 	}
 	
 	private String getSpinnerValue(int id, String columnName)
@@ -351,6 +361,13 @@ public class ProductDetailActivity extends Activity {
 		Spinner spin = (Spinner) findViewById(id);
     	Cursor c = (Cursor)spin.getSelectedItem();
 	    return c.getString(c.getColumnIndex(columnName));
+	}
+	
+	private Integer getSpinnerValueInt(int id, String columnName)
+	{
+		Spinner spin = (Spinner) findViewById(id);
+    	Cursor c = (Cursor)spin.getSelectedItem();
+	    return c.getInt(c.getColumnIndex(columnName));
 	}
 
 	@Override

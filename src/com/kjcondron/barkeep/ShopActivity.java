@@ -19,7 +19,7 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
-public class UseActivity extends Activity {
+public class ShopActivity extends Activity {
 
 	private Boolean gridView = false;
 	private AlertDialog.Builder mbuilder; 
@@ -29,7 +29,6 @@ public class UseActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mdb = new DBHelper(this);
-		mbuilder = new AlertDialog.Builder(this); 
 
 		// Show the Up button in the action bar.
 		setupActionBar();
@@ -43,7 +42,7 @@ public class UseActivity extends Activity {
 				getLGView(R.layout.layout_inventory_list_view, R.id.listview); 
 		try
 		{
-			SimpleCursorAdapter invAdapter = getInvetory();
+			SimpleCursorAdapter invAdapter = getShoppingList();
 			v.setAdapter(invAdapter);
 		}
 		catch(Exception e)
@@ -57,36 +56,6 @@ public class UseActivity extends Activity {
 	{
 		setContentView(layoutId);
 		AbsListView view =  (AbsListView) findViewById(viewID);
-		view.setOnItemClickListener(new OnItemClickListener() {
-	        
-			public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-	            ListView lv = (ListView)parent;
-	            SimpleCursorAdapter Cu = (SimpleCursorAdapter)lv.getAdapter();
-	            Integer iid = Cu.getCursor().getInt(Cu.getCursor().getColumnIndex("_id"));
-	            final int prodId = mdb.updateQuantity(iid);
-	            if( prodId != -1 )
-	            {
-	            	DialogInterface.OnClickListener dcl = new DialogInterface.OnClickListener() {
-
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							switch(which){
-								case DialogInterface.BUTTON_POSITIVE:
-									mdb.addToShopping(prodId, ProductDetailActivity.BARID);
-								case DialogInterface.BUTTON_NEGATIVE:
-							}
-						
-						}
-					};
-					
-					mbuilder.setMessage("Add To Shopping List?").setPositiveButton("Yes", dcl).setNegativeButton("No", dcl).show();
-	            }
-	            	
-	            	
-	            setupView(gridView);
-	        }
-		});
-	        
 	    return view;
 	}
 	
@@ -129,23 +98,21 @@ public class UseActivity extends Activity {
 		return super.onOptionsItemSelected(item);
 	}
 	
-	protected SimpleCursorAdapter getInvetory() throws Exception
+	protected SimpleCursorAdapter getShoppingList() throws Exception
 	{
 		String[] coulmnNames = new String[]{ "brand", "product_name", "size" };
-	    Cursor c = mdb.getInventory(ProductDetailActivity.BARID);
+	    Cursor c = mdb.getShoppingList(ProductDetailActivity.BARID);
 	    c.moveToFirst();
 	    
-	    InventoryAdapter invAdapter = new InventoryAdapter(
+	    SimpleCursorAdapter shopAdapter = new SimpleCursorAdapter(
 	    		this, 
 	    		R.layout.layout_inventory_item,
 	    		c, 
 	    		coulmnNames,
 	    		new int[] { R.id.textView1, R.id.textView2,R.id.textView3 },
-	    		CursorAdapter.NO_SELECTION,
-	    		R.id.progressBar1);
+	    		CursorAdapter.NO_SELECTION);
 	    
-	   
-	    return invAdapter;
+	    return shopAdapter;
 	}
 	
 

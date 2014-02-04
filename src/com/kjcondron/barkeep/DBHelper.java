@@ -1,10 +1,14 @@
 package com.kjcondron.barkeep;
 
+import java.text.MessageFormat;
+
+import android.R.string;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Pair;
+import android.widget.Toast;
 
 import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 
@@ -13,9 +17,11 @@ public class DBHelper extends SQLiteAssetHelper  {
 	private static final String DATABASE_NAME = "barkeep";
 	private static final int DATABASE_VERSION = 1;
 	public static final String NOT_FOUND = "NOT_FOUND";
-
+	private Context m_context;
+	
 	public DBHelper(Context ctxt) {
 		super(ctxt, DATABASE_NAME, null, DATABASE_VERSION);
+		m_context = ctxt;
 	}
 	
 	private String makeOptional(String name)
@@ -130,19 +136,35 @@ public class DBHelper extends SQLiteAssetHelper  {
 	{
 		try{
 			SQLiteDatabase db = getReadableDatabase();
-	        String sql = "select * from Inventory where bar_id=" + barID;
+	        String sql = "select * from vInventory where bar_id=" + barID;
 	        Cursor c = db.rawQuery(sql, null);
 	        c.moveToFirst();
 	        return c;
 		}
 		catch(Exception e)
 		{
-			MainActivity.log_exception(e, "getInvenory");
+			MainActivity.log_exception(e, "getInventory");
 			throw e;
 		}
 	}
 	
-	public Pair< String, Cursor > getFromUPC( String upc ) throws Exception
+	public Cursor getShoppingList( int barID ) throws Exception
+	{
+		try{
+			SQLiteDatabase db = getReadableDatabase();
+	        String sql = "select * from vShoppingList where bar_id=" + barID;
+	        Cursor c = db.rawQuery(sql, null);
+	        c.moveToFirst();
+	        return c;
+		}
+		catch(Exception e)
+		{
+			MainActivity.log_exception(e, "getShoppingList");
+			throw e;
+		}
+	}
+	
+	public Cursor getFromUPC( String upc ) throws Exception
 	{
 		// look up product by UPC in global product tables
 		try
@@ -153,7 +175,12 @@ public class DBHelper extends SQLiteAssetHelper  {
 			// and the have to match the categories hard coded. 
 			// to-do fix that maybe.
 			
-			String [] cats = ProductDetailActivity.categories;
+			String sql = MessageFormat.format("Select * from vProducts where upc=\"{0}\" ", upc);
+			Cursor c = db.rawQuery(sql, null);
+			if(c.getCount() > 0)
+				return c;
+			
+			/*String [] cats = ProductDetailActivity.categories;
 			for(String c : cats)
 			{
 				String sql = "select * from " +
@@ -163,7 +190,7 @@ public class DBHelper extends SQLiteAssetHelper  {
 				Cursor c2 = db.rawQuery(sql, null);
 				if(c2.getCount() > 0)
 					return new Pair<String, Cursor>(c, c2);
-			}
+			}*/
 		}
 		catch(Exception e)
 		{
@@ -189,44 +216,99 @@ public class DBHelper extends SQLiteAssetHelper  {
 	
 	public void writeInventory(
 			Integer barId,
-			String type,
-			String brand,
-			String name,
-			String size,
-			double amount)
+			Integer prodId,
+			double quantity)
 	{
 		SQLiteDatabase dbw = getWritableDatabase();
 		
-		String rcSQL = "select count(*) from Inventory";
-		Cursor c = dbw.rawQuery(rcSQL, null);
-		c.moveToFirst();
-		Integer rowID = c.getInt(0)+1;
-		
-		String sql = "select * from vProducts where product_type =\"" + type +
-				"" +
-				"\" and brand=\"" + brand + "\" and product_name=\"" + name + "\" and size=\"" +
-				size + "\"";
-		
-		Cursor item = dbw.rawQuery(sql, null);
-		item.moveToFirst();
-		String upc = item.getString(item.getColumnIndex("upc"));
-		String ean = item.getString(item.getColumnIndex("ean"));
-		
 		ContentValues values = new ContentValues();
-		values.put("rowid", rowID);
-		values.put("_id", rowID);
 		values.put("bar_id", barId);
-		values.put("type", type);
-		values.put("product_name", name);
-		values.put("brand", brand);
-		values.put("upc", upc);
-		values.put("ean", ean);
-		values.put("size", size);
-		values.put("amt", amount);
+		values.put("product_id", prodId);
+		values.put("quantity", quantity);
 		
 		dbw.insert("Inventory", "product_name", values);
 		 
 		//dbw.execSQL(sql)
 	}
-
+	
+	public void writeProduct(
+			Integer typeId,
+			String brand,
+			String name,
+			String size,
+			String UPC )
+	{
+		SQLiteDatabase dbw = getWritableDatabase();
+					
+			ContentValues values = new ContentValues();
+			values.put("product_key", typeId);
+			values.put("product_name", name);
+			values.put("brand", brand);
+			values.put("upc", UPC);
+			values.put("ean", "1111");
+			values.put("size", size);
+			
+			dbw.insert("Products", "", values);
+			
+			try{
+				if(UPCExsits(UPC))
+					Toast.makeText(m_context, "UPC Exisits", Toast.LENGTH_SHORT).show();
+				else
+					Toast.makeText(m_context, "UPC Still Missing!", Toast.LENGTH_SHORT).show();
+			}
+			catch(Exception e)
+			{
+				Toast.makeText(m_context, "Exception Finding UPC", Toast.LENGTH_SHORT).show();
+			}
+			
+	}
+	
+	public int updateQuantity(Integer invId)
+	{
+		String sql = "select * from vInventory where _id=" + invId;
+		SQLiteDatabase db = getReadableDatabase();
+        
+		Cursor c = db.rawQuery(sql, null);
+        c.moveToFirst();
+         
+        Double quantity = c.getDouble(c.getColumnIndex("quantity"));
+        
+        SQLiteDatabase dbw = getWritableDatabase();
+        
+        ContentValues values = new ContentValues();
+        double newQ = quantity-0.25;
+        values.put("quantity", newQ);
+        
+        int prodId = -1;
+        try
+        {
+        	if( newQ <= 0.0 )
+        	{
+        		String sql2 = "select product_id from Inventory where _id=" + invId;
+        		Cursor c2 = db.rawQuery(sql2, null);
+                c2.moveToFirst();
+                prodId = c2.getInt(0);
+                dbw.delete("Inventory", "_id="+invId, null);
+        	}
+        	else
+        		dbw.update("Inventory", values, "_id="+invId, null);
+        	
+        	return prodId;
+        }
+        catch(Exception e)
+        {
+        	Toast.makeText(m_context, e.getMessage(), Toast.LENGTH_SHORT).show();
+        	return -1; // fix me
+        }		
+	}
+	
+	public void addToShopping(int prodID, int barId)
+	{
+		ContentValues values = new ContentValues();
+	    values.put("bar_id", barId);
+	    values.put("product_id", prodID);
+		
+	    SQLiteDatabase dbw = getWritableDatabase();
+		dbw.insert("ShoppingList", "", values);
+	}
 }

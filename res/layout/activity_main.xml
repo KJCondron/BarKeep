@@ -16,8 +16,8 @@
         android:layout_alignParentRight="true"
         android:layout_marginBottom="17dp"
         android:layout_marginRight="18dp"
-        android:onClick="startRemove"
-        android:text="Remove" />
+        android:onClick="startShop"
+        android:text="To Buy" />
 
     <Button
         android:id="@+id/commitItem"

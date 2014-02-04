@@ -64,7 +64,10 @@
             android:name="com.kjcondron.barkeep.ProductDetailActivity"
             android:label="@string/title_activity_product_detail" >
         </activity>
-        
+        <activity
+            android:name="com.kjcondron.barkeep.ShopActivity"
+            android:label="@string/title_activity_shop" >
+        </activity>
         <activity
 		  android:name="com.dropbox.client2.android.AuthActivity"
 		  android:launchMode="singleTask"

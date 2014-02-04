@@ -86,6 +86,10 @@ public class MainActivity extends Activity {
     	startMyActvity(RemoveActivity.class);
     }
     
+    public void startShop(View view) {
+    	startMyActvity(ShopActivity.class);
+    }
+    
     public void startScan(View view){
     	IntentIntegrator.initiateScan(this);
     }
