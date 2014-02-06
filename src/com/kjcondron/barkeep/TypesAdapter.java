@@ -46,7 +46,7 @@ public class TypesAdapter extends SimpleCursorAdapter {
 		{
 			View nv = newView(mctxt, mcrsr, parent);
 			TextView tv = (TextView)nv.findViewById(mto[0]);
-			tv.setText("Barcode Scan");
+			tv.setText("Scan");
 			v = nv;
 		}
 		else 

@@ -69,10 +69,10 @@ public class AddActivity extends Activity {
 	    
 	    TypesAdapter invAdapter = new TypesAdapter(
 	    		this, 
-	    		R.layout.layout_inventory_item,
+	    		R.layout.layout_types_item,
 	    		c, 
 	    		new String[]{"product_type"},
-	    		new int[] { R.id.textView1 },
+	    		new int[] { R.id.typesText },
 	    		CursorAdapter.NO_SELECTION);
 	    
 	    return invAdapter;
