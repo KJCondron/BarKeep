@@ -16,5 +16,10 @@
         android:showAsAction="never"
         android:title="shopping list"/>
     
+    <item
+        android:id="@+id/deletebars"
+        android:showAsAction="never"
+        android:title="delete bars"/>
+    
     
 </menu>

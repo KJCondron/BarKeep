@@ -24,21 +24,27 @@ public class ProductDetailActivity extends Activity {
 	public final static String[] categories = {"Whisky","Rum","Gin","Vodka","Tequila"};
 	public final static Integer IDCOL = 0;
 	public final static Integer TYPENAMECOL = 1;
-	public final static Integer BARID = 1;
+	
 	
 	private Boolean mAddToDB = false;
 	private Boolean mHaveUPC = false;
 	
 	private void createAllProducts()
-	{
-		Intent intent = getIntent();
-		String type = intent.getStringExtra(AddActivity.PRODUCT_TYPE);
-				
+	{		
 	    ActionBar ab = getActionBar();
 		ab.setTitle("Select Product");
 		
 	    setupListeners();
-		setupTypeSpinner(type); // triggers other spinners
+		
+	    Intent intent = getIntent();
+	    if(intent.hasExtra(AddActivity.PRODUCT_TYPE)){
+	    	String type = intent.getStringExtra(AddActivity.PRODUCT_TYPE);
+	    	setupTypeSpinner(type); // triggers other spinners
+	    }
+	    else{
+	    	long typeid = intent.getLongExtra(AddActivity.PRODUCT_TYPEID, 0);
+	    	setupTypeSpinner(typeid); // triggers other spinners
+	    }
 		
 		findViewById(R.id.prodDetail_commitItem).setVisibility(View.VISIBLE);
 		findViewById(R.id.prodDetail_commitItemAddToProducts).setVisibility(View.INVISIBLE);
@@ -62,10 +68,7 @@ public class ProductDetailActivity extends Activity {
 		    
 	    	String upc = intent.getStringExtra(UPC);
 	    	
-	    	// pair because due to (bad) db design type is the name of the 
-	    	// table not in the cursor (to-do could be fixed with a view)
 	    	Cursor upcDeets = new DBHelper(this).getFromUPC(upc); 
-	    	//adapter.add(upcDeets.first);
 	    	
 	    	adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		    typeSpinner.setAdapter(adapter);
@@ -247,6 +250,43 @@ public class ProductDetailActivity extends Activity {
 		}
 	    
 	}
+	
+	protected void setupTypeSpinner(long typeid)
+	{
+		try
+		{
+			Spinner typeSpinner = (Spinner) findViewById(R.id.prodDetail_typeSpinner);
+
+			DBHelper db = new DBHelper(this);
+		    Cursor c = db.getTypes();
+		    
+		    SimpleCursorAdapter adapter = new SimpleCursorAdapter(
+		    		this, 
+		    		android.R.layout.simple_spinner_dropdown_item,
+		    		c, 
+		    		new String[]{ "product_type" },
+		    		new int[] { android.R.id.text1 },
+		    		CursorAdapter.NO_SELECTION );
+		 
+		    typeSpinner.setAdapter(adapter);
+		    for(int i=0; i<adapter.getCount(); ++i)
+		    {
+		    	SQLiteCursor cur = (SQLiteCursor)adapter.getItem(i);
+		    	int val = cur.getInt(IDCOL);
+		    	if(val == typeid)
+		    	{
+		    		typeSpinner.setSelection(i);
+		    		break;
+		    	}
+		    }
+		    
+		}
+		catch(Exception e)
+		{
+			MainActivity.log_exception(e, "setupTypeSpinner");
+		}
+	    
+	}
 		
 	protected void setupBrandSpinner(String product)
 	{
@@ -329,7 +369,7 @@ public class ProductDetailActivity extends Activity {
 		DBHelper db = new DBHelper(this);
 		
 		db.writeInventory(
-				BARID,
+				MainActivity.BARID,
 				getSpinnerValueInt(R.id.prodDetail_prodSpinner, "_id"),
 				1.0);
 		
@@ -341,7 +381,7 @@ public class ProductDetailActivity extends Activity {
 		DBHelper db = new DBHelper(this);
 		
 		db.writeInventory(
-				BARID,
+				MainActivity.BARID,
 				getSpinnerValueInt(R.id.prodDetail_prodSpinner, "_id"),
 				1.0);
 		

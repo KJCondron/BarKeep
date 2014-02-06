@@ -2,13 +2,10 @@ package com.kjcondron.barkeep;
 
 import java.text.MessageFormat;
 
-import android.R.bool;
-import android.R.string;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Pair;
 import android.widget.Toast;
 
 import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
@@ -39,7 +36,7 @@ public class DBHelper extends SQLiteAssetHelper  {
 	{
 		SQLiteDatabase db = getReadableDatabase();
         
-		String sql = "select * from Inventory";    
+		String sql = "select * from Bars";    
         Cursor c = db.rawQuery(sql, null);
         c.moveToFirst();
         return c.getCount() > 0;
@@ -191,17 +188,6 @@ public class DBHelper extends SQLiteAssetHelper  {
 			if(c.getCount() > 0)
 				return c;
 			
-			/*String [] cats = ProductDetailActivity.categories;
-			for(String c : cats)
-			{
-				String sql = "select * from " +
-						c + 
-						" where upc='" + upc + "'";
-				
-				Cursor c2 = db.rawQuery(sql, null);
-				if(c2.getCount() > 0)
-					return new Pair<String, Cursor>(c, c2);
-			}*/
 		}
 		catch(Exception e)
 		{
@@ -239,7 +225,6 @@ public class DBHelper extends SQLiteAssetHelper  {
 		
 		dbw.insert("Inventory", "product_name", values);
 		 
-		//dbw.execSQL(sql)
 	}
 	
 	public void writeProduct(
@@ -327,5 +312,38 @@ public class DBHelper extends SQLiteAssetHelper  {
 	{
 		SQLiteDatabase dbw = getWritableDatabase();
 		dbw.delete("ShoppingList", "_id=" + iid, null);
+	}
+	
+	
+	public void newBar(String barName)
+	{
+		ContentValues values = new ContentValues();
+	    values.put("name", barName);
+		
+	    SQLiteDatabase dbw = getWritableDatabase();
+		dbw.insert("Bars", "", values);
+	}
+	
+	public void clearBars()
+	{
+		getWritableDatabase().execSQL("delete from Bars");
+	}
+	
+	public Cursor getBars() throws Exception
+	{
+		try{
+			SQLiteDatabase db = getReadableDatabase();
+	        
+			String sql ="select * from Bars";
+	        Cursor c2 = db.rawQuery(sql, null);
+	   
+	        c2.moveToFirst();
+	        return c2;
+		}
+		catch(Exception e)
+		{
+			MainActivity.log_exception(e, "getBars");
+			throw e;
+		}
 	}
 }

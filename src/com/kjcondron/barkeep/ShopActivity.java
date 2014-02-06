@@ -139,7 +139,7 @@ public class ShopActivity extends Activity {
 	protected SimpleCursorAdapter getShoppingList() throws Exception
 	{
 		String[] coulmnNames = new String[]{ "brand", "product_name", "size" };
-	    Cursor c = mdb.getShoppingList(ProductDetailActivity.BARID);
+	    Cursor c = mdb.getShoppingList(MainActivity.BARID);
 	    c.moveToFirst();
 	    
 	    SimpleCursorAdapter shopAdapter = new SimpleCursorAdapter(

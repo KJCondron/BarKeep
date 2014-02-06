@@ -2,7 +2,6 @@ package com.kjcondron.barkeep;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.support.v4.widget.CursorAdapter;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -25,7 +24,6 @@ public class InventoryAdapter extends SimpleCursorAdapter {
 	{
 		super(ctxt, layout, cursor, textColumns, to, flag);
 		mQuantityId = quantityTo;
-		mQuantityId = R.id.progressBar1;
 	}
 	
 	@Override
@@ -38,7 +36,6 @@ public class InventoryAdapter extends SimpleCursorAdapter {
 	{
 		super.bindView(view, context, cursor);
 		ProgressBar progQ =(ProgressBar)view.findViewById(mQuantityId);
-		
 		
 		int qIdx = cursor.getColumnIndexOrThrow("quantity");
 		int q = (int)(cursor.getDouble(qIdx) * 100);

@@ -7,10 +7,21 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.widget.CursorAdapter;
+import android.support.v4.widget.SimpleCursorAdapter;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
 
 public class MainActivity extends Activity {
+	
+	public static int BARID;	
 	
 	
 	/* Checks if external storage is available for read and write */
@@ -58,17 +69,66 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.layout_splash);
-        try{
-        	wait(2000);
+        
+        final DBHelper db = new DBHelper(this);
+        if(db.haveBar())
+        {
+        	/*Spinner spin = new Spinner(this);
+        	try{
+        	
+        	SimpleCursorAdapter adapter = new SimpleCursorAdapter(
+		    		this, 
+		    		android.R.layout.simple_spinner_dropdown_item,
+		    		db.getBars(), 
+		    		new String[]{ "name" },
+		    		new int[] { android.R.id.text1 },
+		    		CursorAdapter.NO_SELECTION );
+        	spin.setAdapter(adapter);
+        	spin.setOnClickListener(new Spinner.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					// spin.getAdapter()
+					BARID=1;
+					startMyActvity(UseActivity.class);
+				}
+			});
         	}
-        catch(Exception e) {}
-        
-        if(new DBHelper(this).haveBar())
+        	catch(Exception e){}
+        	setContentView(spin);*/
+        	try{
+        		BARID = db.getBars().getInt(0);
+        		}
+        	catch(Exception e){BARID=1;}
         	startMyActvity(UseActivity.class);
-        
-        finish();
-        
+        }
+        else
+        {
+        	setContentView(R.layout.layout_splash);
+        	EditText edtBarName = (EditText)findViewById(R.id.edtBarName);
+        	edtBarName.setOnEditorActionListener(new OnEditorActionListener() {
+				
+				@Override
+				public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+					// TODO Auto-generated method stub
+					if(actionId == EditorInfo.IME_ACTION_DONE)
+					{
+						db.newBar(v.getText().toString());
+						startMyActvity(UseActivity.class);
+						startMyActvity(AddActivity.class);
+						try{
+			        		BARID = db.getBars().getInt(0);
+			        		}
+			        	catch(Exception e){BARID=1;}
+						finish();
+						return true;
+					}
+					return false;
+				}
+			});
+        	
+        }
     }
 
 

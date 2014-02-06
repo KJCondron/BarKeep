@@ -80,7 +80,7 @@ public class UseActivity extends Activity {
 						public void onClick(DialogInterface dialog, int which) {
 							switch(which){
 								case DialogInterface.BUTTON_POSITIVE:
-									mdb.addToShopping(prodId, ProductDetailActivity.BARID);
+									mdb.addToShopping(prodId, MainActivity.BARID);
 								case DialogInterface.BUTTON_NEGATIVE:
 							}
 						
@@ -141,6 +141,12 @@ public class UseActivity extends Activity {
 			Intent sIntent = new Intent(this, ShopActivity.class);
 	    	startActivity(sIntent);
 			return true;
+		case R.id.deletebars:
+			(new DBHelper(this)).clearBars();
+			finish();
+			Intent mIntent = new Intent(this, MainActivity.class);
+	    	startActivity(mIntent);
+			return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}
@@ -148,7 +154,7 @@ public class UseActivity extends Activity {
 	protected SimpleCursorAdapter getInvetory() throws Exception
 	{
 		String[] coulmnNames = new String[]{ "brand", "product_name", "size" };
-	    Cursor c = mdb.getInventory(ProductDetailActivity.BARID);
+	    Cursor c = mdb.getInventory(MainActivity.BARID);
 	    c.moveToFirst();
 	    
 	    InventoryAdapter invAdapter = new InventoryAdapter(

@@ -5,28 +5,78 @@ import android.app.Activity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
+import android.widget.CursorAdapter;
+import android.widget.GridView;
+import android.widget.SimpleCursorAdapter;
+import android.widget.Toast;
+import android.widget.AdapterView.OnItemClickListener;
 import android.support.v4.app.NavUtils;
 import android.annotation.TargetApi;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Build;
 
 public class AddActivity extends Activity {
 	
 	public final static String PRODUCT_TYPE = "com.kjcondron.barkeep.PRODUCT_TYPE";
+	public final static String PRODUCT_TYPEID = "com.kjcondron.barkeep.PRODUCT_TYPEID";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_add);
+		//setContentView(R.layout.activity_add);
+		setContentView(R.layout.layout_types_grid);
 		// Show the Up button in the action bar.
 		setupActionBar();
+		setupGridView();
 	}
 	
-	// if add subscreen should die after a product is added 
-	/*protected void onRestart() {
-		super.onResume();
-		finish();
-	}*/
+	protected void setupGridView()
+	{
+		GridView gv = (GridView) findViewById(R.id.typesgridview);  
+		gv.setOnItemClickListener(new OnItemClickListener() {  
+			public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+				GridView gv2 = (GridView)(parent);
+				TypesAdapter adapter = (TypesAdapter) gv2.getAdapter();
+				Cursor cc = adapter.getCursor();
+				if(position == cc.getCount())
+					startScan();
+				else
+				{
+					long pid = cc.getInt(0);
+					addProduct(pid);
+				}
+			}} );
+	    
+		try
+		{
+			SimpleCursorAdapter invAdapter = getTypes();
+			gv.setAdapter(invAdapter);
+		}
+		catch(Exception e)
+		{
+			Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+		}
+	}
+	
+	protected SimpleCursorAdapter getTypes() throws Exception
+	{
+		DBHelper db = new DBHelper(this);
+		Cursor c = db.getTypes();
+	    c.moveToFirst();
+	    
+	    TypesAdapter invAdapter = new TypesAdapter(
+	    		this, 
+	    		R.layout.layout_inventory_item,
+	    		c, 
+	    		new String[]{"product_type"},
+	    		new int[] { R.id.textView1 },
+	    		CursorAdapter.NO_SELECTION);
+	    
+	    return invAdapter;
+	}
 
 	/**
 	 * Set up the {@link android.app.ActionBar}, if the API is available.
@@ -59,7 +109,7 @@ public class AddActivity extends Activity {
 			NavUtils.navigateUpFromSameTask(this);
 			return true;
 		case R.id.menu_barcode:
-			startScan(item.getActionView());
+			startScan();
 			finish();
 			return true;
 			
@@ -70,9 +120,20 @@ public class AddActivity extends Activity {
 	private void addProduct(String s) {
 		Intent intent = new Intent(this, ProductDetailActivity.class);
 	    intent.putExtra(PRODUCT_TYPE, s);
-	    startActivity(intent);
+	    addProduct(intent);
+	}
+	
+	private void addProduct(long id) {
+		Intent intent = new Intent(this, ProductDetailActivity.class);
+	    intent.putExtra(PRODUCT_TYPEID, id);
+	    addProduct(intent);
+	}
+	
+	private void addProduct(Intent intent) {
+		startActivity(intent);
 	    finish();
 	}
+		
 	
 	public void addWhisky(View view) { addProduct("Whisky"); }
 	public void addRum(View view) { addProduct("Rum"); }
@@ -82,7 +143,7 @@ public class AddActivity extends Activity {
 	public void addOther(View view) { addProduct("Other"); }
 	public void addLiqueur(View view) { addProduct("Liqueur"); }
 	
-	public void startScan(View view){
+	public void startScan(){
     	IntentIntegrator.initiateScan(this);
     }
     
