@@ -71,8 +71,8 @@ public class AddActivity extends Activity {
 	    		this, 
 	    		R.layout.layout_types_item,
 	    		c, 
-	    		new String[]{"product_type"},
-	    		new int[] { R.id.typesText },
+	    		new String[]{"product_type", "image_path"},
+	    		new int[] { R.id.typeText, R.id.typeImage },
 	    		CursorAdapter.NO_SELECTION);
 	    
 	    return invAdapter;
@@ -170,7 +170,7 @@ public class AddActivity extends Activity {
     					}
     					catch(Exception e)
     					{
-    						MainActivity.log_exception(e, "MainActivity.onActivityResult");
+    						MainActivity.log_exception(this, e, "MainActivity.onActivityResult");
     						// do nothing we are showing main activity
     					}
     				}

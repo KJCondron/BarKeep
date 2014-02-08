@@ -1,11 +1,15 @@
 package com.kjcondron.barkeep;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.text.MessageFormat;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Environment;
 import android.widget.Toast;
 
 import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
@@ -15,7 +19,7 @@ public class DBHelper extends SQLiteAssetHelper  {
 	private static final String DATABASE_NAME = "barkeep";
 	private static final int DATABASE_VERSION = 1;
 	public static final String NOT_FOUND = "NOT_FOUND";
-	private Context m_context;
+	private final Context m_context;
 	
 	public DBHelper(Context ctxt) {
 		super(ctxt, DATABASE_NAME, null, DATABASE_VERSION);
@@ -27,9 +31,9 @@ public class DBHelper extends SQLiteAssetHelper  {
 		return "select distinct -1 as _id, ' Other' as " + name + " union ";
 	}
 	
-	public Cursor getBrands( String tableName) throws Exception
+	public Cursor getBrands( String type ) throws Exception
 	{
-		return getBrands(tableName,false);
+		return getBrands(type,false);
 	}
 	
 	public Boolean haveBar()
@@ -56,7 +60,7 @@ public class DBHelper extends SQLiteAssetHelper  {
 		}
 		catch(Exception e)
 		{
-			MainActivity.log_exception(e, "getTypes");
+			MainActivity.log_exception(m_context, e, "getTypes");
 			throw e;
 		}
 	}
@@ -68,8 +72,6 @@ public class DBHelper extends SQLiteAssetHelper  {
 	        
 			String optionSql = includeOther ? makeOptional("brand") : "";
 			
-	        //String sql = optionSql + "select distinct _id, brand from products" + tableName + " Group by brand Order by brand";
-	        
 	        String sql = optionSql + "select _id, brand from vProducts " +
 	        		"where product_type=\"" + type + 
 	        		"\" group by brand";
@@ -81,7 +83,27 @@ public class DBHelper extends SQLiteAssetHelper  {
 		}
 		catch(Exception e)
 		{
-			MainActivity.log_exception(e, "getBrands");
+			MainActivity.log_exception(m_context,e, "getBrands");
+			throw e;
+		}
+	}
+	
+	public Cursor getBrandsFilter( String type, CharSequence constraint ) throws Exception
+	{
+		try{
+			SQLiteDatabase db = getReadableDatabase();
+	        
+			String sql = "select _id, brand from vProducts where product_type=\"" + type
+					+ "\" and brand like \"" + constraint + "%\" group by brand";
+			
+	        Cursor c2 = db.rawQuery(sql, null);
+	   
+	        c2.moveToFirst();
+	        return c2;
+		}
+		catch(Exception e)
+		{
+			MainActivity.log_exception(m_context,e, "getBrands");
 			throw e;
 		}
 	}
@@ -109,7 +131,28 @@ public class DBHelper extends SQLiteAssetHelper  {
 		}
 		catch(Exception e)
 		{
-			MainActivity.log_exception(e, "getProducts");
+			MainActivity.log_exception(m_context,e, "getProducts");
+			throw e;
+		}
+	}
+	
+	public Cursor getProductsFilter( String type, String brand, CharSequence constraint  ) throws Exception
+	{
+		try{
+			SQLiteDatabase db = getReadableDatabase();
+			
+			String sql = "select _id, product_name from vProducts where product_type=\"" + type
+					+ "\" and brand=\"" + brand
+					+ "\" and product_name like \"" + constraint + "%\" group by product_name";
+			
+	        Cursor c = db.rawQuery(sql, null);
+		    
+		    c.moveToFirst();
+		    return c;
+		}
+		catch(Exception e)
+		{
+			MainActivity.log_exception(m_context,e, "getProductsFilter");
 			throw e;
 		}
 	}
@@ -135,7 +178,7 @@ public class DBHelper extends SQLiteAssetHelper  {
 		}
 		catch(Exception e)
 		{
-			MainActivity.log_exception(e, "getSizes");
+			MainActivity.log_exception(m_context,e, "getSizes");
 			throw e;
 		}
 	}
@@ -151,7 +194,7 @@ public class DBHelper extends SQLiteAssetHelper  {
 		}
 		catch(Exception e)
 		{
-			MainActivity.log_exception(e, "getInventory");
+			MainActivity.log_exception(m_context, e, "getInventory");
 			throw e;
 		}
 	}
@@ -167,7 +210,7 @@ public class DBHelper extends SQLiteAssetHelper  {
 		}
 		catch(Exception e)
 		{
-			MainActivity.log_exception(e, "getShoppingList");
+			MainActivity.log_exception(m_context, e, "getShoppingList");
 			throw e;
 		}
 	}
@@ -191,7 +234,7 @@ public class DBHelper extends SQLiteAssetHelper  {
 		}
 		catch(Exception e)
 		{
-			MainActivity.log_exception(e, "getFromUPC");
+			MainActivity.log_exception(m_context, e, "getFromUPC");
 			throw e;
 		}
 		
@@ -227,12 +270,12 @@ public class DBHelper extends SQLiteAssetHelper  {
 		 
 	}
 	
-	public void writeProduct(
+	public int writeProduct(
 			Integer typeId,
 			String brand,
 			String name,
 			String size,
-			String UPC )
+			String UPC ) throws Exception
 	{
 		SQLiteDatabase dbw = getWritableDatabase();
 					
@@ -246,17 +289,9 @@ public class DBHelper extends SQLiteAssetHelper  {
 			
 			dbw.insert("Products", "", values);
 			
-			try{
-				if(UPCExsits(UPC))
-					Toast.makeText(m_context, "UPC Exisits", Toast.LENGTH_SHORT).show();
-				else
-					Toast.makeText(m_context, "UPC Still Missing!", Toast.LENGTH_SHORT).show();
-			}
-			catch(Exception e)
-			{
-				Toast.makeText(m_context, "Exception Finding UPC", Toast.LENGTH_SHORT).show();
-			}
-			
+			Cursor c=getFromUPC(UPC);
+			c.moveToFirst();
+			return c.getInt(c.getColumnIndex("_id"));
 	}
 	
 	public int updateQuantity(Integer invId)
@@ -342,8 +377,35 @@ public class DBHelper extends SQLiteAssetHelper  {
 		}
 		catch(Exception e)
 		{
-			MainActivity.log_exception(e, "getBars");
+			MainActivity.log_exception(m_context, e, "getBars");
 			throw e;
+		}
+	}
+	
+	
+	public void saveDB(Context context)
+	{
+		try{
+		close();
+		String dir = context.getApplicationInfo().dataDir + "/databases";
+		String path = dir +"/" + DATABASE_NAME;
+		String DEST = Environment.getExternalStorageDirectory().getAbsolutePath()+"/images/barkeep_db";
+		FileInputStream dbs = new FileInputStream(path);
+		File f = new File(DEST);
+		FileOutputStream ds = new FileOutputStream(f);
+		
+		byte[] buffer = new byte[1024];
+        int length;
+        while ((length = dbs.read(buffer))>0){
+            ds.write(buffer, 0, length);
+        }
+        ds.flush();
+        ds.close();
+        dbs.close();
+        }
+		catch(Exception e)
+		{
+			MainActivity.log_exception(context, e, "saveDB");
 		}
 	}
 }

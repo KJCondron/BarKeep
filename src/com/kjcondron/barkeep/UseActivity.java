@@ -147,6 +147,9 @@ public class UseActivity extends Activity {
 			Intent mIntent = new Intent(this, MainActivity.class);
 	    	startActivity(mIntent);
 			return true;
+		case R.id.savedb:
+			(new DBHelper(this)).saveDB(this);
+			Toast.makeText(this, "saved db", Toast.LENGTH_LONG).show();
 		}
 		return super.onOptionsItemSelected(item);
 	}

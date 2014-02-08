@@ -4,11 +4,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
@@ -17,6 +19,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.TextView.OnEditorActionListener;
 
 public class MainActivity extends Activity {
@@ -43,9 +46,11 @@ public class MainActivity extends Activity {
 	    return false;
 	}
 	
-	public static void log_exception(Exception e, String fromWhere)
+	public static void log_exception(Context c, Exception e, String fromWhere)
 	{
-		// to-do add logging code
+		Log.e("barkeep", e.getMessage());
+		Toast.makeText(c, e.getMessage(), Toast.LENGTH_LONG).show();
+		/*// to-do add logging code
 		if(isExternalStorageWritable())
 		{
 			
@@ -63,7 +68,7 @@ public class MainActivity extends Activity {
 			}
 			catch(Exception o){}
 				
-		}
+		}*/
 	}
 	
     @Override
@@ -102,6 +107,7 @@ public class MainActivity extends Activity {
         		}
         	catch(Exception e){BARID=1;}
         	startMyActvity(UseActivity.class);
+        	finish();
         }
         else
         {

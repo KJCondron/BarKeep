@@ -2,18 +2,20 @@ package com.kjcondron.barkeep;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteCursor;
 import android.os.Bundle;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
-import android.util.Pair;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.FilterQueryProvider;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -21,11 +23,11 @@ public class ProductDetailActivity extends Activity {
 	
 	public final static String ADD_TO_DB = "com.kjcondron.barkeep.ADD_TO_DB";
 	public final static String UPC = "com.kjcondron.barkeep.UPC";
-	public final static String[] categories = {"Whisky","Rum","Gin","Vodka","Tequila"};
 	public final static Integer IDCOL = 0;
 	public final static Integer TYPENAMECOL = 1;
 	
-	
+	private DBHelper m_db;
+    
 	private Boolean mAddToDB = false;
 	private Boolean mHaveUPC = false;
 	
@@ -68,7 +70,7 @@ public class ProductDetailActivity extends Activity {
 		    
 	    	String upc = intent.getStringExtra(UPC);
 	    	
-	    	Cursor upcDeets = new DBHelper(this).getFromUPC(upc); 
+	    	Cursor upcDeets = m_db.getFromUPC(upc); 
 	    	
 	    	adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		    typeSpinner.setAdapter(adapter);
@@ -85,7 +87,7 @@ public class ProductDetailActivity extends Activity {
 		}
     	catch(Exception e)
     	{
-    		MainActivity.log_exception(e, "ProductDetailActivity.onCreateAllSingleProduct");
+    		MainActivity.log_exception(this, e, "ProductDetailActivity.onCreateAllSingleProduct");
     	}
     
 	}
@@ -93,15 +95,22 @@ public class ProductDetailActivity extends Activity {
 	// to-do fix this first
 	private void createProductNotFound()
 	{
-		setContentView(R.layout.activity_product_detail);
+		setContentView(R.layout.layout_add_product);
 		ActionBar ab = getActionBar();
 		ab.setTitle("Product Not Found");
 		
-	    setupListeners();
-	    setupTypeSpinner(categories[0]);
-	    
-	    findViewById(R.id.prodDetail_commitItem).setVisibility(View.INVISIBLE);
-		findViewById(R.id.prodDetail_commitItemAddToProducts).setVisibility(View.VISIBLE);
+	    try
+	    {
+	    	String type = m_db.getTypes().getString(TYPENAMECOL);
+	    	setupTypeSpinner(type);
+			setupBrandAutoComplete();
+			setupProductAutoComplete();
+	    }
+	    catch(Exception e)
+	    {
+	    	MainActivity.log_exception(this, e, "createProductNotFound");
+	    	finish();
+	    }
 	
 	}
 
@@ -109,6 +118,7 @@ public class ProductDetailActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		m_db = new DBHelper(this);
 		setContentView(R.layout.activity_product_detail);
 		
 		// This activity can be use to display
@@ -145,7 +155,25 @@ public class ProductDetailActivity extends Activity {
     	return ctype.getInt(IDCOL);
 	}
 	
-	protected void setupListeners()
+	private String getBrandAuto()
+	{
+		return ((AutoCompleteTextView) findViewById(
+					R.id.prodDetail_brandACTV)).getText().toString();
+	}
+	
+	private String getProductAuto()
+	{
+		return ((AutoCompleteTextView) findViewById(
+					R.id.prodDetail_prodACTV)).getText().toString();
+	}
+	
+	private String getSizeAuto()
+	{
+		return ((AutoCompleteTextView) findViewById(
+					R.id.prodDetail_sizeACTV)).getText().toString();
+	}
+		
+	protected void setupTypeListener()
 	{
 		Spinner typeSpinner = (Spinner) findViewById(R.id.prodDetail_typeSpinner);
 	    
@@ -162,7 +190,12 @@ public class ProductDetailActivity extends Activity {
 	    }
 
 		});
-		
+
+	}
+	
+	protected void setupListeners()
+	{		
+		setupTypeListener();
 		Spinner brandSpinner = (Spinner) findViewById(R.id.prodDetail_brandSpinner);
 		
 		brandSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
@@ -219,8 +252,7 @@ public class ProductDetailActivity extends Activity {
 		{
 			Spinner typeSpinner = (Spinner) findViewById(R.id.prodDetail_typeSpinner);
 
-			DBHelper db = new DBHelper(this);
-		    Cursor c = db.getTypes();
+			Cursor c = m_db.getTypes();
 		    
 		    SimpleCursorAdapter adapter = new SimpleCursorAdapter(
 		    		this, 
@@ -246,7 +278,7 @@ public class ProductDetailActivity extends Activity {
 		}
 		catch(Exception e)
 		{
-			MainActivity.log_exception(e, "setupTypeSpinner");
+			MainActivity.log_exception(this, e, "setupTypeSpinner");
 		}
 	    
 	}
@@ -257,8 +289,7 @@ public class ProductDetailActivity extends Activity {
 		{
 			Spinner typeSpinner = (Spinner) findViewById(R.id.prodDetail_typeSpinner);
 
-			DBHelper db = new DBHelper(this);
-		    Cursor c = db.getTypes();
+			Cursor c = m_db.getTypes();
 		    
 		    SimpleCursorAdapter adapter = new SimpleCursorAdapter(
 		    		this, 
@@ -283,7 +314,7 @@ public class ProductDetailActivity extends Activity {
 		}
 		catch(Exception e)
 		{
-			MainActivity.log_exception(e, "setupTypeSpinner");
+			MainActivity.log_exception(this, e, "setupTypeSpinner");
 		}
 	    
 	}
@@ -294,32 +325,140 @@ public class ProductDetailActivity extends Activity {
 		{
 			Spinner brands = (Spinner) findViewById(R.id.prodDetail_brandSpinner);
 			
-		    DBHelper db = new DBHelper(this);
-		    Cursor c = db.getBrands(product, mAddToDB);
+		    Cursor c = m_db.getBrands(product, mAddToDB);
 		    
 		    setupSpinner(c, "brand", brands);
 		}
 		catch(Exception e)
 		{
-			MainActivity.log_exception(e, "setupBrandSpinner");
+			MainActivity.log_exception(this, e, "setupBrandSpinner");
 		}
 	    
 	}
-		
+	
+	protected void setupBrandAutoComplete()
+	{
+		try
+		{
+			final String type = getType();
+			AutoCompleteTextView brands = (AutoCompleteTextView) findViewById(R.id.prodDetail_brandACTV);
+			brands.setThreshold(1);
+			
+		    Cursor c = m_db.getBrands(type, false);
+		    
+		    SimpleCursorAdapter adapter = new SimpleCursorAdapter(
+		    		this, 
+		    		android.R.layout.simple_dropdown_item_1line,
+		    		c, 
+		    		new String[]{ "brand" },
+		    		new int[] { android.R.id.text1 },
+		    		CursorAdapter.NO_SELECTION );
+		    
+		    adapter.setCursorToStringConverter(new SimpleCursorAdapter.CursorToStringConverter() {
+				
+				@Override
+				public CharSequence convertToString(Cursor cursor) {
+					// TODO Auto-generated method stub
+					return cursor.getString(cursor.getColumnIndex("brand"));
+				}
+			});
+		    
+		    final Context ctxt = this;
+		    adapter.setFilterQueryProvider(new FilterQueryProvider() {
+				
+				@Override
+				public Cursor runQuery(CharSequence constraint) {
+					// TODO Auto-generated method stub
+					try
+					{
+						return m_db.getBrandsFilter(getType(), constraint);
+					}
+					catch(Exception e)
+					{
+						MainActivity.log_exception(ctxt, e, "setupProductAutoComplete.runQuery");
+						return null;
+					}
+				}
+			});
+		    
+		    brands.setAdapter(adapter);
+
+		}
+		catch(Exception e)
+		{
+			MainActivity.log_exception(this, e, "setupBrandAutoComplete");
+		}
+	    
+	}
+	
+	protected void setupProductAutoComplete()
+	{
+		try
+		{
+			AutoCompleteTextView prod = (AutoCompleteTextView) findViewById(R.id.prodDetail_prodACTV);
+			prod.setThreshold(1);
+			
+			// brand is going to come from autocomplete
+		    Cursor c = m_db.getProducts(getType(), getBrandAuto());
+		    
+		    SimpleCursorAdapter adapter = new SimpleCursorAdapter(
+		    		this, 
+		    		android.R.layout.simple_dropdown_item_1line,
+		    		c, 
+		    		new String[]{ "product_name" },
+		    		new int[] { android.R.id.text1 },
+		    		CursorAdapter.NO_SELECTION );
+		    
+		    adapter.setCursorToStringConverter(new SimpleCursorAdapter.CursorToStringConverter() {
+				
+				@Override
+				public CharSequence convertToString(Cursor cursor) {
+					// TODO Auto-generated method stub
+					return cursor.getString(cursor.getColumnIndex("product_name"));
+				}
+			});
+		    
+		    final Context ctxt = this;
+		    adapter.setFilterQueryProvider(new FilterQueryProvider() {
+				
+				@Override
+				public Cursor runQuery(CharSequence constraint) {
+					// TODO Auto-generated method stub
+					try
+					{
+						return m_db.getProductsFilter(getType(), getBrandAuto(), constraint);
+					}
+					catch(Exception e)
+					{
+						MainActivity.log_exception(ctxt, e, "setupProductAutoComplete.runQuery");
+						return null;
+					}
+				}
+			});
+		    
+		    prod.setAdapter(adapter);
+
+		}
+		catch(Exception e)
+		{
+			MainActivity.log_exception(this, e, "setupBrandAutoComplete");
+		}
+	    
+	}
+	
 	protected void setupProdSpinner(String type, String brand)
 	{
 		try
 		{
 			Spinner prods = (Spinner) findViewById(R.id.prodDetail_prodSpinner);
 		    
-		    DBHelper db = new DBHelper(this);
-		    Cursor c = db.getProducts(type, brand, mAddToDB);
+		    Cursor c = m_db.getProducts(type, brand, mAddToDB);
 		    
 		    setupSpinner(c, "product_name", prods);
 		    	    	    
 		}
 		catch(Exception e){
-			MainActivity.log_exception(e, "setupProdSpinner");
+			MainActivity.log_exception(this, e, "setupProdSpinner");
 		}
 	    
 	}
@@ -330,14 +469,13 @@ public class ProductDetailActivity extends Activity {
 		{
 			Spinner size = (Spinner) findViewById(R.id.prodDetail_sizeSpinner);
 		    
-		    DBHelper db = new DBHelper(this);
-		    Cursor c = db.getSizes(type, brand, product, mAddToDB);
+		    Cursor c = m_db.getSizes(type, brand, product, mAddToDB);
 		    	    	    
 		    setupSpinner(c, "size", size);
 		}
 		catch(Exception e)
 		{
-			MainActivity.log_exception(e, "setupSizeSpinner");
+			MainActivity.log_exception(this, e, "setupSizeSpinner");
 		}
 	    
 	}
@@ -359,48 +497,43 @@ public class ProductDetailActivity extends Activity {
 		
 		catch(Exception e)
 		{
-			MainActivity.log_exception(e, "setupSpinner");
+			MainActivity.log_exception(this, e, "setupSpinner");
 		}
 	    
 	}
 	
 	public void commitItem(View view)
 	{
-		DBHelper db = new DBHelper(this);
-		
-		db.writeInventory(
+		m_db.writeInventory(
 				MainActivity.BARID,
-				getSpinnerValueInt(R.id.prodDetail_prodSpinner, "_id"),
+				getSpinnerValueInt(R.id.prodDetail_sizeSpinner, "_id"),
 				1.0);
 		
 		finish();    	
 	}
 	
-	public void commitItemAddToProducts(View view) throws Exception
+	public void commitItemAddToProducts(View view)
 	{
-		DBHelper db = new DBHelper(this);
-		
-		db.writeInventory(
-				MainActivity.BARID,
-				getSpinnerValueInt(R.id.prodDetail_prodSpinner, "_id"),
-				1.0);
-		
+		try {
 		String upc = getIntent().getStringExtra(UPC);
-		db.writeProduct(
+		int newProdId = m_db.writeProduct(
 				getTypeId(),
-				getSpinnerValue(R.id.prodDetail_brandSpinner, "brand"),
-				getSpinnerValue(R.id.prodDetail_prodSpinner, "product_name"),
-				getSpinnerValue(R.id.prodDetail_sizeSpinner, "size"),
+				getBrandAuto(),
+				getProductAuto(),
+				getSizeAuto(),
 				upc);
 		
+		m_db.writeInventory(
+				MainActivity.BARID,
+				newProdId,
+				1.0);
+		
 		finish();
-	}
-	
-	private String getSpinnerValue(int id, String columnName)
-	{
-		Spinner spin = (Spinner) findViewById(id);
-    	Cursor c = (Cursor)spin.getSelectedItem();
-	    return c.getString(c.getColumnIndex(columnName));
+		}
+		catch(Exception e)
+		{
+			MainActivity.log_exception(this, e, "commitItemAddToProducts");
+		}
 	}
 	
 	private Integer getSpinnerValueInt(int id, String columnName)
