@@ -11,7 +11,9 @@ import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -56,7 +58,7 @@ public class UseActivity extends Activity {
 		}
 		catch(Exception e)
 		{
-			Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+			MainActivity.log_exception(this, e, "UseActivity.setupView");
 		}
 	}
 	
@@ -64,12 +66,11 @@ public class UseActivity extends Activity {
 	protected AbsListView getLGView(int layoutId, int viewID)
 	{
 		setContentView(layoutId);
-		AbsListView view =  (AbsListView) findViewById(viewID);
+		final AbsListView view = (AbsListView) findViewById(viewID);
 		view.setOnItemClickListener(new OnItemClickListener() {
 	        
 			public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-	            ListView lv = (ListView)parent;
-	            SimpleCursorAdapter Cu = (SimpleCursorAdapter)lv.getAdapter();
+	            SimpleCursorAdapter Cu = (SimpleCursorAdapter)parent.getAdapter();
 	            Integer iid = Cu.getCursor().getInt(Cu.getCursor().getColumnIndex("_id"));
 	            final int prodId = mdb.updateQuantity(iid);
 	            if( prodId != -1 )
@@ -89,10 +90,26 @@ public class UseActivity extends Activity {
 					
 					mbuilder.setMessage("Add To Shopping List?").setPositiveButton("Yes", dcl).setNegativeButton("No", dcl).show();
 	            }
-	            	
-	            	
+	            
+	            int idx = parent.getFirstVisiblePosition();
+	            View top = parent.getChildAt(0);
+	            int offset = (top == null) ? 0 : v.getTop();
 	            setupView(gridView);
+	            // restore position
+	            if(!gridView)
+	            {
+	            	ListView lv2 = (ListView) parent;
+	            	lv2.setSelectionFromTop(idx, offset);
+	            }
 	        }
+		});
+		
+		view.setOnTouchListener( new OnTouchListener() {
+			
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {					
+				return false;
+			}
 		});
 	        
 	    return view;
@@ -150,6 +167,17 @@ public class UseActivity extends Activity {
 		case R.id.savedb:
 			(new DBHelper(this)).saveDB(this);
 			Toast.makeText(this, "saved db", Toast.LENGTH_LONG).show();
+			return true;
+		case R.id.new_bar:
+			Intent nintent = new Intent(this, MainActivity.class);
+			nintent.putExtra(MainActivity.MAKEBAR, true);
+			startActivity(nintent);
+			return true;
+		case R.id.change_bar:
+			Intent cintent = new Intent(this, MainActivity.class);
+			cintent.putExtra(MainActivity.MAKEBAR, false);
+			startActivity(cintent);
+			return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}

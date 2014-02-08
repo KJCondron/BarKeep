@@ -3,6 +3,7 @@ package com.kjcondron.barkeep;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -67,31 +68,58 @@ public class ShopActivity extends Activity {
 	{
 		setContentView(layoutId);
 		AbsListView view =  (AbsListView) findViewById(viewID);
+		
+		try{
+		final Context c = this;
 		view.setOnItemClickListener(new OnItemClickListener() {
 	        
 			public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-	            ListView lv = (ListView)parent;
-	            SimpleCursorAdapter Cu = (SimpleCursorAdapter)lv.getAdapter();
-	            final Integer iid = Cu.getCursor().getInt(Cu.getCursor().getColumnIndex("_id"));
-	            	DialogInterface.OnClickListener dcl = new DialogInterface.OnClickListener() {
-
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							switch(which){
-								case DialogInterface.BUTTON_POSITIVE:
-									mdb.removeFromShopping(iid);
-									setupView(gridView);
-									break;
-								case DialogInterface.BUTTON_NEGATIVE:
+				try
+				{
+		            ListView lv = (ListView)parent;
+		            SimpleCursorAdapter Cu = (SimpleCursorAdapter)lv.getAdapter();
+		            final Integer iid = Cu.getCursor().getInt(Cu.getCursor().getColumnIndex("_id"));
+		            final Integer pid = mdb.getProdIdFromShoppingId(iid);
+		            	DialogInterface.OnClickListener dcl = new DialogInterface.OnClickListener() {
+	
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								switch(which){
+									case DialogInterface.BUTTON_POSITIVE:
+										mdb.writeInventory(MainActivity.BARID, pid, 1.0);
+										mdb.removeFromShopping(iid);
+										finish();
+										break;
+									case DialogInterface.BUTTON_NEUTRAL:
+										mdb.removeFromShopping(iid);
+										finish();
+										break;
+									case DialogInterface.BUTTON_NEGATIVE:
+										setupView(gridView);
+										break;
+										
+								}
 							}
+						};
 						
-						}
-					};
-					
-					mbuilder.setMessage("Remove?").setPositiveButton("Yes", dcl).setNegativeButton("No", dcl).show();
-	                setupView(gridView);
-	        }
-		});
+						mbuilder.setMessage("Bought?").
+							setPositiveButton("Yes", dcl).
+								setNeutralButton("No", dcl).
+									setNegativeButton("Cancel", dcl).
+									setCancelable(true).
+										show();
+	                
+				}
+				catch(Exception e1)
+				{
+					MainActivity.log_exception(c, e1, "onItemClick");
+				}
+			}
+		});}
+		catch(Exception e)
+		{
+			MainActivity.log_exception(this, e, "ShopActicity.getLGView");
+		}
 	        
 	    return view;
 	}

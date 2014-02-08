@@ -215,6 +215,22 @@ public class DBHelper extends SQLiteAssetHelper  {
 		}
 	}
 	
+	public int getProdIdFromShoppingId( int shopping_id ) throws Exception
+	{
+		try{
+			SQLiteDatabase db = getReadableDatabase();
+	        String sql = "select * from ShoppingList where _id=" + shopping_id;
+	        Cursor c = db.rawQuery(sql, null);
+	        c.moveToFirst();
+	        return c.getInt(c.getColumnIndex("product_id"));
+		}
+		catch(Exception e)
+		{
+			MainActivity.log_exception(m_context, e, "getShoppingList");
+			throw e;
+		}
+	}
+	
 	public Cursor getFromUPC( String upc ) throws Exception
 	{
 		// look up product by UPC in global product tables
@@ -328,8 +344,8 @@ public class DBHelper extends SQLiteAssetHelper  {
         }
         catch(Exception e)
         {
-        	Toast.makeText(m_context, e.getMessage(), Toast.LENGTH_SHORT).show();
-        	return -1; // fix me
+        	MainActivity.log_exception(m_context, e, "updateQuantity");
+        	return -1; // TODO - fix me
         }		
 	}
 	
@@ -350,13 +366,24 @@ public class DBHelper extends SQLiteAssetHelper  {
 	}
 	
 	
-	public void newBar(String barName)
+	public int newBar(String barName)
 	{
 		ContentValues values = new ContentValues();
 	    values.put("name", barName);
 		
 	    SQLiteDatabase dbw = getWritableDatabase();
 		dbw.insert("Bars", "", values);
+		
+		return getBarId(barName);
+	}
+	
+	public int getBarId(String barName)
+	{
+		SQLiteDatabase db = getReadableDatabase();
+		String sql = MessageFormat.format("Select * from Bars where name=\"{0}\" ", barName);
+		Cursor c = db.rawQuery(sql, null);
+		c.moveToFirst();
+		return c.getInt(0);
 	}
 	
 	public void clearBars()
@@ -408,4 +435,5 @@ public class DBHelper extends SQLiteAssetHelper  {
 			MainActivity.log_exception(context, e, "saveDB");
 		}
 	}
+	
 }

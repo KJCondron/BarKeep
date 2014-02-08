@@ -18,7 +18,8 @@ import android.widget.Toast;
 public class MainActivity extends Activity {
 	
 	public static int BARID;	
-	
+	public final static String MAKEBAR = "com.kjcondron.barkeep.MAKE_BAR";
+
 	
 	/* Checks if external storage is available for read and write */
 	public static boolean isExternalStorageWritable() {
@@ -74,7 +75,9 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         
         final DBHelper db = new DBHelper(this);
-        if(db.haveBar())
+        final Boolean makeNewBar =  getIntent().hasExtra(MAKEBAR);
+        final Boolean makeNewBarFlag = getIntent().getBooleanExtra(MAKEBAR, false);
+        if( db.haveBar() && !makeNewBar )
         {
         	/*Spinner spin = new Spinner(this);
         	try{
@@ -98,9 +101,10 @@ public class MainActivity extends Activity {
         	}
         	catch(Exception e){}
         	setContentView(spin);*/
-        	try{
+        	try
+        	{
         		BARID = db.getBars().getInt(0);
-        		}
+        	}
         	catch(Exception e){BARID=1;}
         	startMyActvity(UseActivity.class);
         	finish();
@@ -115,13 +119,19 @@ public class MainActivity extends Activity {
 				public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 					if(actionId == EditorInfo.IME_ACTION_DONE)
 					{
-						db.newBar(v.getText().toString());
+						if(makeNewBarFlag)
+							BARID = db.newBar(v.getText().toString());
+						else
+						try
+						{
+							BARID = db.getBarId(v.getText().toString());
+						}
+						catch(Exception e)
+						{
+							MainActivity.log_exception(getApplicationContext(), e, "changeBar");
+						}
 						startMyActvity(UseActivity.class);
 						startMyActvity(AddActivity.class);
-						try{
-			        		BARID = db.getBars().getInt(0);
-			        		}
-			        	catch(Exception e){BARID=1;}
 						finish();
 						return true;
 					}

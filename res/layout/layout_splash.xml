@@ -2,17 +2,17 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bar_gradient"
     android:orientation="vertical" >
     
     <ImageView
         android:id="@+id/imageView1"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:background="@android:color/transparent" 
-        android:src="@drawable/barkeep" />
+        android:adjustViewBounds="true"
+        android:background="@drawable/bar_gradient"
+        android:src="@drawable/logo_barkeep" />
 
     <ImageView
         android:id="@+id/imageView2"
