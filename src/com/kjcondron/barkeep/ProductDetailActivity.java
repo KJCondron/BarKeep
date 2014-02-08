@@ -9,15 +9,21 @@ import android.database.sqlite.SQLiteCursor;
 import android.os.Bundle;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnFocusChangeListener;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.FilterQueryProvider;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
 
 public class ProductDetailActivity extends Activity {
 	
@@ -103,6 +109,7 @@ public class ProductDetailActivity extends Activity {
 	    {
 	    	String type = m_db.getTypes().getString(TYPENAMECOL);
 	    	setupTypeSpinner(type);
+	    	setupTypeListener(true);
 			setupBrandAutoComplete();
 			setupProductAutoComplete();
 	    }
@@ -173,16 +180,26 @@ public class ProductDetailActivity extends Activity {
 					R.id.prodDetail_sizeACTV)).getText().toString();
 	}
 		
-	protected void setupTypeListener()
+	protected void setupTypeListener(final Boolean addingToDB)
 	{
 		Spinner typeSpinner = (Spinner) findViewById(R.id.prodDetail_typeSpinner);
 	    
 		typeSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
 	    @Override
 	    public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-	    	TextView tv = (TextView) selectedItemView;
-	    	String type = tv.getText().toString();
-	    	setupBrandSpinner(type);
+	    	if(!addingToDB){
+	    		
+		    	TextView tv = (TextView) selectedItemView;
+		    	String type = tv.getText().toString();
+		    	setupBrandSpinner(type);
+	    	}
+	    	else
+	    	{
+				AutoCompleteTextView actv = (AutoCompleteTextView)findViewById(R.id.prodDetail_brandACTV); 
+				actv.setText("");
+				setupBrandAutoComplete();
+				actv.requestFocus();
+			}
 	    }
 
 	    @Override
@@ -190,12 +207,11 @@ public class ProductDetailActivity extends Activity {
 	    }
 
 		});
-
 	}
 	
 	protected void setupListeners()
 	{		
-		setupTypeListener();
+		setupTypeListener(false);
 		Spinner brandSpinner = (Spinner) findViewById(R.id.prodDetail_brandSpinner);
 		
 		brandSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
@@ -358,7 +374,6 @@ public class ProductDetailActivity extends Activity {
 				
 				@Override
 				public CharSequence convertToString(Cursor cursor) {
-					// TODO Auto-generated method stub
 					return cursor.getString(cursor.getColumnIndex("brand"));
 				}
 			});
@@ -382,7 +397,53 @@ public class ProductDetailActivity extends Activity {
 			});
 		    
 		    brands.setAdapter(adapter);
-
+		    
+		    brands.setOnEditorActionListener(new OnEditorActionListener() {
+				
+		    	@Override
+				public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+					if(actionId == EditorInfo.IME_ACTION_NEXT)
+					{
+						findViewById(R.id.prodDetail_prodACTV).requestFocus();
+						return true;
+					}
+					return false;
+				}
+			});
+		    
+		    brands.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					AutoCompleteTextView av = (AutoCompleteTextView) v;
+					av.showDropDown();
+					return;
+				}
+			});
+		    
+		    brands.setOnItemClickListener(new OnItemClickListener() {
+			
+		    	@Override
+		    	public void onItemClick(AdapterView<?> parent, View selected, int pos, long id)
+		    	{
+		    		return;
+		    	}
+		    });
+		    
+		    brands.setOnFocusChangeListener(new OnFocusChangeListener() {
+				
+				@Override
+				public void onFocusChange(View v, boolean hasFocus) {
+					// TODO Auto-generated method stub
+					if(hasFocus)
+					{
+						AutoCompleteTextView av = (AutoCompleteTextView) v;
+						//av.showDropDown();
+					}
+				}
+			});
+			
 		}
 		catch(Exception e)
 		{
@@ -437,6 +498,40 @@ public class ProductDetailActivity extends Activity {
 			});
 		    
 		    prod.setAdapter(adapter);
+		    
+		    prod.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					AutoCompleteTextView av = (AutoCompleteTextView) v;
+					av.showDropDown();
+					return;
+				}
+			});
+		    
+		    prod.setOnItemClickListener(new OnItemClickListener() {
+			
+		    	@Override
+		    	public void onItemClick(AdapterView<?> parent, View selected, int pos, long id)
+		    	{
+		    		return;
+		    	}
+		    });
+		    
+		    prod.setOnFocusChangeListener(new OnFocusChangeListener() {
+				
+				@Override
+				public void onFocusChange(View v, boolean hasFocus) {
+					// TODO Auto-generated method stub
+					if(hasFocus)
+					{
+						AutoCompleteTextView av = (AutoCompleteTextView) v;
+						//av.showDropDown();
+					}
+				}
+			});
+		
 
 		}
 		catch(Exception e)

@@ -1,26 +1,19 @@
 package com.kjcondron.barkeep;
 
-import java.io.File;
-import java.io.FileOutputStream;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.widget.CursorAdapter;
-import android.support.v4.widget.SimpleCursorAdapter;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.TextView.OnEditorActionListener;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
 	
@@ -48,8 +41,7 @@ public class MainActivity extends Activity {
 	
 	public static void log_exception(Context c, Exception e, String fromWhere)
 	{
-		Log.e("barkeep", e.getMessage());
-		Toast.makeText(c, e.getMessage(), Toast.LENGTH_LONG).show();
+		log_message(c, e.getMessage(), fromWhere);
 		/*// to-do add logging code
 		if(isExternalStorageWritable())
 		{
@@ -71,6 +63,12 @@ public class MainActivity extends Activity {
 		}*/
 	}
 	
+	public static void log_message(Context c, String s, String fromWhere)
+	{
+		Log.e("barkeep", s);
+		Toast.makeText(c, s, Toast.LENGTH_LONG).show();
+	}
+	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,7 +80,6 @@ public class MainActivity extends Activity {
         	try{
         	
         	SimpleCursorAdapter adapter = new SimpleCursorAdapter(
-		    		this, 
 		    		android.R.layout.simple_spinner_dropdown_item,
 		    		db.getBars(), 
 		    		new String[]{ "name" },

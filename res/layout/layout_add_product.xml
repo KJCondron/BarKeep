@@ -32,7 +32,8 @@
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/prodDetail_textViewBrand"
         android:layout_below="@+id/prodDetail_typeSpinner"
-         />
+        android:imeOptions="actionNext"
+        android:singleLine="true" />
     
      <TextView
         android:id="@+id/prodDetail_textViewProd"
@@ -46,7 +47,9 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/prodDetail_textViewProd"
-        android:layout_below="@+id/prodDetail_brandACTV" /> 
+        android:layout_below="@+id/prodDetail_brandACTV"
+        android:imeOptions="actionNext"
+        android:singleLine="true" /> 
     
     <TextView
         android:id="@+id/prodDetail_textViewSize"
@@ -60,7 +63,9 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/prodDetail_textViewSize"
-        android:layout_below="@+id/prodDetail_prodACTV" />
+        android:layout_below="@+id/prodDetail_prodACTV"
+        android:imeOptions="actionDone"
+        android:singleLine="true" />
     
     <Button
         android:id="@+id/prodDetail_commitItemAddToProducts"
