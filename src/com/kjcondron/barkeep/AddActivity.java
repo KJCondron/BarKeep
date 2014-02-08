@@ -1,22 +1,21 @@
 package com.kjcondron.barkeep;
 
-import android.os.Bundle;
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Intent;
+import android.database.Cursor;
+import android.os.Build;
+import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.CursorAdapter;
 import android.widget.GridView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
-import android.widget.AdapterView.OnItemClickListener;
-import android.support.v4.app.NavUtils;
-import android.annotation.TargetApi;
-import android.content.Intent;
-import android.database.Cursor;
-import android.os.Build;
 
 public class AddActivity extends Activity {
 	
@@ -110,7 +109,6 @@ public class AddActivity extends Activity {
 			return true;
 		case R.id.menu_barcode:
 			startScan();
-			finish();
 			return true;
 			
 		}
@@ -167,11 +165,11 @@ public class AddActivity extends Activity {
 	    						intent.putExtra(ProductDetailActivity.ADD_TO_DB, true);	
 	    					
 	    					startActivity(intent);
+	    					finish();
     					}
     					catch(Exception e)
     					{
     						MainActivity.log_exception(this, e, "MainActivity.onActivityResult");
-    						// do nothing we are showing main activity
     					}
     				}
     			}

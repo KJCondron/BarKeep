@@ -383,7 +383,6 @@ public class ProductDetailActivity extends Activity {
 				
 				@Override
 				public Cursor runQuery(CharSequence constraint) {
-					// TODO Auto-generated method stub
 					try
 					{
 						return m_db.getBrandsFilter(getType(), constraint);
@@ -415,7 +414,6 @@ public class ProductDetailActivity extends Activity {
 				
 				@Override
 				public void onClick(View v) {
-					// TODO Auto-generated method stub
 					AutoCompleteTextView av = (AutoCompleteTextView) v;
 					av.showDropDown();
 					return;
@@ -435,7 +433,6 @@ public class ProductDetailActivity extends Activity {
 				
 				@Override
 				public void onFocusChange(View v, boolean hasFocus) {
-					// TODO Auto-generated method stub
 					if(hasFocus)
 					{
 						AutoCompleteTextView av = (AutoCompleteTextView) v;
@@ -474,7 +471,6 @@ public class ProductDetailActivity extends Activity {
 				
 				@Override
 				public CharSequence convertToString(Cursor cursor) {
-					// TODO Auto-generated method stub
 					return cursor.getString(cursor.getColumnIndex("product_name"));
 				}
 			});
@@ -484,7 +480,6 @@ public class ProductDetailActivity extends Activity {
 				
 				@Override
 				public Cursor runQuery(CharSequence constraint) {
-					// TODO Auto-generated method stub
 					try
 					{
 						return m_db.getProductsFilter(getType(), getBrandAuto(), constraint);
@@ -503,7 +498,6 @@ public class ProductDetailActivity extends Activity {
 				
 				@Override
 				public void onClick(View v) {
-					// TODO Auto-generated method stub
 					AutoCompleteTextView av = (AutoCompleteTextView) v;
 					av.showDropDown();
 					return;
@@ -523,7 +517,6 @@ public class ProductDetailActivity extends Activity {
 				
 				@Override
 				public void onFocusChange(View v, boolean hasFocus) {
-					// TODO Auto-generated method stub
 					if(hasFocus)
 					{
 						AutoCompleteTextView av = (AutoCompleteTextView) v;

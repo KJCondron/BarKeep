@@ -90,7 +90,6 @@ public class MainActivity extends Activity {
 				
 				@Override
 				public void onClick(View v) {
-					// TODO Auto-generated method stub
 					// spin.getAdapter()
 					BARID=1;
 					startMyActvity(UseActivity.class);
@@ -114,7 +113,6 @@ public class MainActivity extends Activity {
 				
 				@Override
 				public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-					// TODO Auto-generated method stub
 					if(actionId == EditorInfo.IME_ACTION_DONE)
 					{
 						db.newBar(v.getText().toString());
