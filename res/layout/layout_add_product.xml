@@ -5,7 +5,9 @@
     android:layout_gravity="center"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
-    tools:context=".ProductDetailActivity" >
+    tools:context=".ProductDetailActivity"
+    android:background="@drawable/gradient_box"
+     >
     
     <TextView
         android:id="@+id/prodDetail_textViewType"

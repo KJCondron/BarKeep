@@ -11,7 +11,6 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:adjustViewBounds="true"
-        android:background="@drawable/bar_gradient"
         android:src="@drawable/logo_barkeep" />
 
     <ImageView
@@ -40,7 +39,16 @@
          android:imeOptions="actionDone"
          android:lines="1"
          android:maxLines="1"
-         android:singleLine="true" />
+         android:singleLine="true"
+         android:visibility="gone" />
+
+     <StackView
+         android:id="@+id/stackView1"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_centerHorizontal="true"
+         android:layout_centerVertical="true" >
+     </StackView>
      
      </RelativeLayout>
 

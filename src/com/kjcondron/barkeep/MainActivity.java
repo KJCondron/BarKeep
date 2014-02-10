@@ -10,7 +10,9 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.StackView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
@@ -103,6 +105,9 @@ public class MainActivity extends Activity {
         	setContentView(spin);*/
         	try
         	{
+        		StackView sv = (StackView)findViewById(R.id.stackView1);
+        		
+        		ArrayAdapter aa = new Arr
         		BARID = db.getBars().getInt(0);
         	}
         	catch(Exception e){BARID=1;}
