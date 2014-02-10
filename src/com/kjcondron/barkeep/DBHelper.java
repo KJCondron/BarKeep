@@ -10,7 +10,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
-import android.widget.Toast;
 
 import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 
@@ -384,11 +383,6 @@ public class DBHelper extends SQLiteAssetHelper  {
 		Cursor c = db.rawQuery(sql, null);
 		c.moveToFirst();
 		return c.getInt(0);
-	}
-	
-	public void clearBars()
-	{
-		getWritableDatabase().execSQL("delete from Bars");
 	}
 	
 	public Cursor getBars() throws Exception

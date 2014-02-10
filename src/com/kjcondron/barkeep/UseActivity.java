@@ -158,12 +158,6 @@ public class UseActivity extends Activity {
 			Intent sIntent = new Intent(this, ShopActivity.class);
 	    	startActivity(sIntent);
 			return true;
-		case R.id.deletebars:
-			(new DBHelper(this)).clearBars();
-			finish();
-			Intent mIntent = new Intent(this, MainActivity.class);
-	    	startActivity(mIntent);
-			return true;
 		case R.id.savedb:
 			(new DBHelper(this)).saveDB(this);
 			Toast.makeText(this, "saved db", Toast.LENGTH_LONG).show();
