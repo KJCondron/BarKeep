@@ -3,19 +3,26 @@ package com.kjcondron.barkeep;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.StackView;
+import android.widget.TextSwitcher;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
+import android.widget.ViewSwitcher.ViewFactory;
 
 public class MainActivity extends Activity {
 	
@@ -79,6 +86,7 @@ public class MainActivity extends Activity {
         final DBHelper db = new DBHelper(this);
         final Boolean makeNewBar =  getIntent().hasExtra(MAKEBAR);
         final Boolean makeNewBarFlag = getIntent().getBooleanExtra(MAKEBAR, false);
+        
         if( db.haveBar() && !makeNewBar )
         {
         	/*Spinner spin = new Spinner(this);
@@ -105,14 +113,74 @@ public class MainActivity extends Activity {
         	setContentView(spin);*/
         	try
         	{
-        		StackView sv = (StackView)findViewById(R.id.stackView1);
+        		/*StackView sv = (StackView)findViewById(R.id.stackView1);
         		
-        		ArrayAdapter aa = new Arr
+        		ArrayAdapter aa = new Arr*/
+        		setContentView(R.layout.layout_splash);
+        		View view = findViewById(R.id.layout_slpash);
+				final TextSwitcher ts = (TextSwitcher) findViewById(R.id.textSwitcher1);
+				final Cursor barCursor = db.getBars();
+				barCursor.moveToFirst();
+				ts.setFactory( new ViewFactory() {
+					
+					@Override
+					public View makeView() {
+						TextView myText = new TextView(MainActivity.this);
+						myText.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL);
+                        myText.setTextSize(36);
+                        myText.setTextColor(Color.BLUE);
+                        return myText;
+					}
+				});
+				
+        		
+        		final Context ctxt = this;
+        		view.setOnTouchListener(new OnTouchListener() {
+					
+        			Boolean newBar = false;
+					@Override
+					public boolean onTouch(View v, MotionEvent event) {
+						switch(event.getActionMasked())
+						{
+							case MotionEvent.ACTION_DOWN:
+								// can log position I guess
+								return true;
+							case MotionEvent.ACTION_MOVE:
+								// check direction
+								return true;
+							case MotionEvent.ACTION_UP:
+								try
+								{
+									if(newBar)
+									{
+										ts.setText( "New Bar" );
+										barCursor.moveToFirst();
+										newBar = false;
+										BARID=0; //TODO
+									}
+									else
+									{
+										ts.setText( barCursor.getString(1) );
+										BARID = barCursor.getInt(0);
+										if(!barCursor.moveToNext())
+											newBar = true;
+									}
+								}
+								catch(Exception e)
+								{
+									MainActivity.log_exception(ctxt, e, "TouchListener");
+								}
+								return true;
+						}	
+						return false;
+					}
+				});
+        		
         		BARID = db.getBars().getInt(0);
         	}
         	catch(Exception e){BARID=1;}
-        	startMyActvity(UseActivity.class);
-        	finish();
+        	//startMyActvity(UseActivity.class);
+        	//finish();
         }
         else
         {
@@ -168,12 +236,8 @@ public class MainActivity extends Activity {
     	startMyActvity(UseActivity.class);
     }
     
-    public void startRemove(View view) {
-    	startMyActvity(RemoveActivity.class);
-    }
-    
     public void startShop(View view) {
     	startMyActvity(ShopActivity.class);
     }
     
-    }
+}

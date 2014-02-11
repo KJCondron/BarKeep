@@ -1,10 +1,16 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:tools="http://schemas.android.com/tools"    
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradient_box">
+    
+
+<RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_gravity="center"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
+    android:layout_centerInParent="true"
     tools:context=".ProductDetailActivity" >
     
     <TextView
@@ -81,5 +87,7 @@
         android:onClick="commitItemAddToProducts"
         android:text="Add + Update"
         android:layout_below="@+id/prodDetail_sizeSpinner" />
+
+</RelativeLayout>
 
 </RelativeLayout>
