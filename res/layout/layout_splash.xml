@@ -43,14 +43,6 @@
          android:singleLine="true"
          android:visibility="gone" />
 
-     <StackView
-         android:id="@+id/stackView1"
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:layout_centerHorizontal="true"
-         android:layout_centerVertical="true"
-         android:visibility="gone" >
-     </StackView>
 
      <TextSwitcher
          android:id="@+id/textSwitcher1"

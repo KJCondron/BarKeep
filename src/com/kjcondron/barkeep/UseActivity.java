@@ -163,13 +163,8 @@ public class UseActivity extends Activity {
 			Toast.makeText(this, "saved db", Toast.LENGTH_LONG).show();
 			return true;
 		case R.id.new_bar:
-			Intent nintent = new Intent(this, MainActivity.class);
-			nintent.putExtra(MainActivity.MAKEBAR, true);
-			startActivity(nintent);
-			return true;
 		case R.id.change_bar:
 			Intent cintent = new Intent(this, MainActivity.class);
-			cintent.putExtra(MainActivity.MAKEBAR, false);
 			startActivity(cintent);
 			return true;
 		}

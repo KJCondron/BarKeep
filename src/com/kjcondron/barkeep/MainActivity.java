@@ -1,5 +1,6 @@
 package com.kjcondron.barkeep;
 
+import android.R.bool;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -8,6 +9,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -15,9 +17,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.inputmethod.EditorInfo;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.StackView;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
@@ -27,9 +27,8 @@ import android.widget.ViewSwitcher.ViewFactory;
 public class MainActivity extends Activity {
 	
 	public static int BARID;	
-	public final static String MAKEBAR = "com.kjcondron.barkeep.MAKE_BAR";
-
-	
+	boolean makeNewBar;
+		
 	/* Checks if external storage is available for read and write */
 	public static boolean isExternalStorageWritable() {
 	    String state = Environment.getExternalStorageState();
@@ -84,39 +83,13 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         
         final DBHelper db = new DBHelper(this);
-        final Boolean makeNewBar =  getIntent().hasExtra(MAKEBAR);
-        final Boolean makeNewBarFlag = getIntent().getBooleanExtra(MAKEBAR, false);
+        makeNewBar = false;
+        setContentView(R.layout.layout_splash);
         
-        if( db.haveBar() && !makeNewBar )
+        if( db.haveBar() )
         {
-        	/*Spinner spin = new Spinner(this);
-        	try{
-        	
-        	SimpleCursorAdapter adapter = new SimpleCursorAdapter(
-		    		android.R.layout.simple_spinner_dropdown_item,
-		    		db.getBars(), 
-		    		new String[]{ "name" },
-		    		new int[] { android.R.id.text1 },
-		    		CursorAdapter.NO_SELECTION );
-        	spin.setAdapter(adapter);
-        	spin.setOnClickListener(new Spinner.OnClickListener() {
-				
-				@Override
-				public void onClick(View v) {
-					// spin.getAdapter()
-					BARID=1;
-					startMyActvity(UseActivity.class);
-				}
-			});
-        	}
-        	catch(Exception e){}
-        	setContentView(spin);*/
         	try
         	{
-        		/*StackView sv = (StackView)findViewById(R.id.stackView1);
-        		
-        		ArrayAdapter aa = new Arr*/
-        		setContentView(R.layout.layout_splash);
         		View view = findViewById(R.id.layout_slpash);
 				final TextSwitcher ts = (TextSwitcher) findViewById(R.id.textSwitcher1);
 				final Cursor barCursor = db.getBars();
@@ -133,88 +106,84 @@ public class MainActivity extends Activity {
 					}
 				});
 				
-        		
-        		final Context ctxt = this;
-        		view.setOnTouchListener(new OnTouchListener() {
-					
-        			Boolean newBar = false;
+
+				final GestureDetector gd = new GestureDetector(
+						this,
+						new FrontPageGestureListener(this, ts, barCursor, ts));
+        		view.setOnTouchListener( new OnTouchListener() {
+        			boolean newBar = false;
 					@Override
 					public boolean onTouch(View v, MotionEvent event) {
+						// TODO Auto-generated method stub
 						switch(event.getActionMasked())
 						{
-							case MotionEvent.ACTION_DOWN:
-								// can log position I guess
-								return true;
-							case MotionEvent.ACTION_MOVE:
-								// check direction
-								return true;
-							case MotionEvent.ACTION_UP:
-								try
+						case MotionEvent.ACTION_UP:
+							try
+							{
+								if(newBar)
 								{
-									if(newBar)
-									{
-										ts.setText( "New Bar" );
-										barCursor.moveToFirst();
-										newBar = false;
-										BARID=0; //TODO
-									}
-									else
-									{
-										ts.setText( barCursor.getString(1) );
-										BARID = barCursor.getInt(0);
-										if(!barCursor.moveToNext())
-											newBar = true;
-									}
+									ts.setText( "New Bar" );
+									makeNewBar = true;
+									newBar = false;
+									barCursor.moveToFirst();
 								}
-								catch(Exception e)
+								else
 								{
-									MainActivity.log_exception(ctxt, e, "TouchListener");
+									ts.setText( barCursor.getString(1) );
+									BARID = barCursor.getInt(0);
+									makeNewBar = false;
+									if(!barCursor.moveToNext())
+										newBar = true;
 								}
-								return true;
-						}	
-						return false;
+							}
+							catch(Exception e)
+							{
+								MainActivity.log_exception(MainActivity.this, e, "TouchListener");
+							}
+							return true;
+						
+						}
+						return gd.onTouchEvent(event);
 					}
-				});
-        		
-        		BARID = db.getBars().getInt(0);
+				});		
         	}
-        	catch(Exception e){BARID=1;}
-        	//startMyActvity(UseActivity.class);
-        	//finish();
+        	catch(Exception e)
+        	{
+        		BARID=1;
+        		startMyActvity(UseActivity.class);
+            	finish();
+            	return;
+        	}
+        	 
         }
         else
-        {
-        	setContentView(R.layout.layout_splash);
-        	EditText edtBarName = (EditText)findViewById(R.id.edtBarName);
-        	edtBarName.setOnEditorActionListener(new OnEditorActionListener() {
-				
-				@Override
-				public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-					if(actionId == EditorInfo.IME_ACTION_DONE)
-					{
-						if(makeNewBarFlag)
-							BARID = db.newBar(v.getText().toString());
-						else
-						try
-						{
-							BARID = db.getBarId(v.getText().toString());
-						}
-						catch(Exception e)
-						{
-							MainActivity.log_exception(getApplicationContext(), e, "changeBar");
-						}
-						startMyActvity(UseActivity.class);
-						startMyActvity(AddActivity.class);
-						finish();
-						return true;
-					}
-					return false;
-				}
-			});
-        	
-        }
+        	makeNewBar();
+    	
     }
-
+    
+    public void makeNewBar()
+    {
+    	setContentView(R.layout.layout_splash);
+    	final DBHelper db = new DBHelper(this);
+    	final EditText edtBarName = (EditText)findViewById(R.id.edtBarName);
+    	edtBarName.setVisibility(View.VISIBLE);
+    	edtBarName.setOnEditorActionListener(new OnEditorActionListener() {
+			
+			@Override
+			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+				if(actionId == EditorInfo.IME_ACTION_DONE)
+				{
+					BARID = db.newBar(v.getText().toString());
+					startMyActvity(UseActivity.class);
+					startMyActvity(AddActivity.class);
+					finish();
+					edtBarName.setVisibility(View.GONE);
+					return true;
+				}
+				return false;
+			}
+		});
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -233,11 +202,14 @@ public class MainActivity extends Activity {
     }
     
     public void startUse(View view) {
-    	startMyActvity(UseActivity.class);
+    	if(makeNewBar)
+    		makeNewBar();
+    	else
+    		startMyActvity(UseActivity.class);
     }
     
     public void startShop(View view) {
     	startMyActvity(ShopActivity.class);
     }
-    
+    	
 }
