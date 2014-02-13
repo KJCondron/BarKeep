@@ -167,6 +167,10 @@ public class UseActivity extends Activity {
 			Intent cintent = new Intent(this, MainActivity.class);
 			startActivity(cintent);
 			return true;
+		case R.id.testhttp:
+			HttpHelper hh = new HttpHelper(this);
+			hh.getDetails("619947000020");
+			return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}

@@ -74,8 +74,11 @@ public class MainActivity extends Activity {
 	
 	public static void log_message(Context c, String s, String fromWhere)
 	{
+		if(s != null ){
 		Log.e("barkeep", s);
-		Toast.makeText(c, s, Toast.LENGTH_LONG).show();
+		if(c!=null)
+			Toast.makeText(c, s, Toast.LENGTH_LONG).show();
+		}
 	}
 	
     @Override

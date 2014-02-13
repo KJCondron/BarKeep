@@ -30,6 +30,12 @@
         android:id="@+id/savedb"
         android:showAsAction="never"
         android:title="save db"/>
+     
+     <item
+        android:id="@+id/testhttp"
+        android:showAsAction="never"
+        android:title="test http"/>
+    
     
     
 </menu>

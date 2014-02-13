@@ -87,6 +87,27 @@ public class DBHelper extends SQLiteAssetHelper  {
 		}
 	}
 	
+	public Cursor getAllBrands() throws Exception
+	{
+		try{
+			SQLiteDatabase db = getReadableDatabase();
+	        
+			// don't want any brands that match the product types, because we are going
+			// to use this set to find in a page full of data including product types
+	        String sql = "select _id, brand from vProducts where brand not in (select product_type from types) group by brand";
+	        
+	        Cursor c2 = db.rawQuery(sql, null);
+	   
+	        c2.moveToFirst();
+	        return c2;
+		}
+		catch(Exception e)
+		{
+			MainActivity.log_exception(m_context,e, "getAllBrands");
+			throw e;
+		}
+	}
+	
 	public Cursor getBrandsFilter( String type, CharSequence constraint ) throws Exception
 	{
 		try{
