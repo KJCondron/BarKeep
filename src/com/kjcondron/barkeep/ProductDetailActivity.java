@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteCursor;
 import android.os.Bundle;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
@@ -104,13 +105,27 @@ public class ProductDetailActivity extends Activity {
 		setContentView(R.layout.layout_add_product);
 		ActionBar ab = getActionBar();
 		ab.setTitle("Product Not Found");
-		
-	    try
+		final boolean guessFromInternet = true;
+		try
 	    {
-	    	String type = m_db.getTypes().getString(TYPENAMECOL);
+	    
+			String type = "";
+			String brand = "";
+			if(guessFromInternet)
+			{
+				String upc = getIntent().getStringExtra(UPC);
+				HttpHelper.Result res = new HttpHelper(this).getDetails(upc);
+				type = res.type;
+				brand = res.brand;
+			}
+			else
+			{
+				type = m_db.getTypes().getString(TYPENAMECOL);
+			}
+	    	
 	    	setupTypeSpinner(type);
 	    	setupTypeListener(true);
-			setupBrandAutoComplete();
+			setupBrandAutoComplete(brand);
 			setupProductAutoComplete();
 	    }
 	    catch(Exception e)
@@ -187,8 +202,8 @@ public class ProductDetailActivity extends Activity {
 		typeSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
 	    @Override
 	    public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-	    	if(!addingToDB){
-	    		
+	    	if(!addingToDB)
+	    	{
 		    	TextView tv = (TextView) selectedItemView;
 		    	String type = tv.getText().toString();
 		    	setupBrandSpinner(type);
@@ -196,8 +211,7 @@ public class ProductDetailActivity extends Activity {
 	    	else
 	    	{
 				AutoCompleteTextView actv = (AutoCompleteTextView)findViewById(R.id.prodDetail_brandACTV); 
-				actv.setText("");
-				setupBrandAutoComplete();
+				setupBrandAutoComplete(null);
 				actv.requestFocus();
 			}
 	    }
@@ -352,12 +366,14 @@ public class ProductDetailActivity extends Activity {
 	    
 	}
 	
-	protected void setupBrandAutoComplete()
+	protected void setupBrandAutoComplete(String brand)
 	{
 		try
-		{
+		{	 
 			final String type = getType();
 			AutoCompleteTextView brands = (AutoCompleteTextView) findViewById(R.id.prodDetail_brandACTV);
+			String currBrandText = brands.getText().toString();
+			Log.w("kjc", "currentBrand:" + currBrandText);
 			brands.setThreshold(1);
 			
 		    Cursor c = m_db.getBrands(type, false);
@@ -440,6 +456,18 @@ public class ProductDetailActivity extends Activity {
 					}
 				}
 			});
+		    
+		    if(brand != null)
+		    {
+		    	brands.setText(brand);
+		    	Log.w("kjc", "setting brand: " + brand);
+		    }
+		    else
+		    {
+		    	brands.setText(currBrandText);
+		    	Log.w("kjc", "re-setting brand: " + currBrandText);
+		    }
+		    	
 			
 		}
 		catch(Exception e)

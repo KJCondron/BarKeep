@@ -31,7 +31,7 @@ public class HttpHelper {
 	
 	HttpHelper(Context c) { mc = c; mdb = new DBHelper(mc); } 
 	
-	final String PREFIX = "http://www.google.com/search?q=";
+	final String PREFIX = "http://www.google.com/search?q=upc+";
 	
 	class HttpTask extends AsyncTask<String, Void, HttpHelper.Result> {
 			
@@ -66,11 +66,13 @@ public class HttpHelper {
 	        int tpos = 0;
 	        int bpos = 0;
 	        line = in.readLine();
-	        
+	        String allRes = "";
 	        String brand = "";
 	        boolean brandFound = false;
+	        int bestCount = 0;
 	        while( line != null )
 	        {
+	        	allRes += line;
 	        	tpos = 0;
 	        	ts.moveToFirst();
 	        	do
@@ -84,6 +86,7 @@ public class HttpHelper {
 	        		tpos+=1;
 	        	}	
 	        	while(ts.moveToNext());
+	        	
 	        	
 	        	if(! brandFound )
 	        	{
@@ -99,15 +102,31 @@ public class HttpHelper {
 		        		while(m1.find())
 		        			brandCount +=1;
 		        		bcount[bpos] += brandCount;
-		        		if( bcount[bpos] > 20 ) // good enough
+		        		if( bcount[bpos] > 10 ) // good enough
 		        		{
 		        			brand = bs.getString(1);
 		        			brandFound = true;
 		        		}
+		        		
+		        		if( bcount[bpos] > bestCount )
+		        		{
+		        			bestCount = bcount[bpos];
+		        			brand = bs.getString(1);
+		        		}
+		        		bpos +=1;
 		        	} while( !brandFound && bs.moveToNext() );
 	        	}
 	        	
 	        	line = in.readLine();
+	        }
+	        
+	        int c = 0;
+	        ts.moveToFirst();
+	        for( int x : tcount )
+	        {
+	        	if(x>c)
+	        		res.type = ts.getString(1);
+	        	ts.moveToNext();
 	        }
 	        
 			res.brand = brand;

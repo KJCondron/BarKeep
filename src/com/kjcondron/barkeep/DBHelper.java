@@ -94,7 +94,10 @@ public class DBHelper extends SQLiteAssetHelper  {
 	        
 			// don't want any brands that match the product types, because we are going
 			// to use this set to find in a page full of data including product types
-	        String sql = "select _id, brand from vProducts where brand not in (select product_type from types) group by brand";
+	        String sql = "select _id, brand from vProducts where brand not in " +
+	        		"(select 'Liquer' as product_type union " +
+	        		"select 'Liquor' as product_type union " +
+	        		"select product_type from types) group by brand";
 	        
 	        Cursor c2 = db.rawQuery(sql, null);
 	   

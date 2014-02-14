@@ -26,6 +26,8 @@ import android.widget.ViewSwitcher.ViewFactory;
 
 public class MainActivity extends Activity {
 	
+	public final static String NEWBAR = "com.kjcondron.barkeep.NEWBAR"; 
+	
 	public static int BARID;	
 	boolean makeNewBar;
 		
@@ -89,7 +91,9 @@ public class MainActivity extends Activity {
         makeNewBar = false;
         setContentView(R.layout.layout_splash);
         
-        if( db.haveBar() )
+        boolean newBar = getIntent().getBooleanExtra(NEWBAR, false);
+        
+        if( !newBar && db.haveBar() )
         {
         	try
         	{
@@ -113,8 +117,9 @@ public class MainActivity extends Activity {
 				final GestureDetector gd = new GestureDetector(
 						this,
 						new FrontPageGestureListener(this, ts, barCursor, ts));
-        		view.setOnTouchListener( new OnTouchListener() {
-        			boolean newBar = false;
+        		
+				view.setOnTouchListener( new OnTouchListener() {
+        			boolean displayingNewBar = false;
 					@Override
 					public boolean onTouch(View v, MotionEvent event) {
 						// TODO Auto-generated method stub
@@ -123,11 +128,11 @@ public class MainActivity extends Activity {
 						case MotionEvent.ACTION_UP:
 							try
 							{
-								if(newBar)
+								if(displayingNewBar)
 								{
 									ts.setText( "New Bar" );
 									makeNewBar = true;
-									newBar = false;
+									displayingNewBar = false;
 									barCursor.moveToFirst();
 								}
 								else
@@ -136,7 +141,7 @@ public class MainActivity extends Activity {
 									BARID = barCursor.getInt(0);
 									makeNewBar = false;
 									if(!barCursor.moveToNext())
-										newBar = true;
+										displayingNewBar = true;
 								}
 							}
 							catch(Exception e)

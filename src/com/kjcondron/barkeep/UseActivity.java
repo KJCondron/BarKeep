@@ -163,13 +163,13 @@ public class UseActivity extends Activity {
 			Toast.makeText(this, "saved db", Toast.LENGTH_LONG).show();
 			return true;
 		case R.id.new_bar:
+			Intent nintent = new Intent(this, MainActivity.class);
+			nintent.putExtra(MainActivity.NEWBAR, true);
+			startActivity(nintent);
+			return true;
 		case R.id.change_bar:
 			Intent cintent = new Intent(this, MainActivity.class);
 			startActivity(cintent);
-			return true;
-		case R.id.testhttp:
-			HttpHelper hh = new HttpHelper(this);
-			hh.getDetails("619947000020");
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
