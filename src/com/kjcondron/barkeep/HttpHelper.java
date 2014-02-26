@@ -3,6 +3,7 @@ package com.kjcondron.barkeep;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,7 +32,9 @@ public class HttpHelper {
 	
 	HttpHelper(Context c) { mc = c; mdb = new DBHelper(mc); } 
 	
-	final String PREFIX = "http://www.google.com/search?q=upc+";
+	//final String PREFIX = "http://www.google.com/search?q=upc+";
+	final String PREFIX = "http://www.google.com/search?q=";
+	
 	
 	class HttpTask extends AsyncTask<String, Void, HttpHelper.Result> {
 			
@@ -96,24 +99,26 @@ public class HttpHelper {
 		        	{
 		        		String testBrand = bs.getString(1);
 		        		String s = testBrand.split("'")[0]; //simple throw away of ' not found in html 
-		        		Pattern p1 = Pattern.compile(s);
-		        		Matcher m1 = p1.matcher(line);
-		        		int brandCount = 0;
-		        		while(m1.find())
-		        			brandCount +=1;
-		        		bcount[bpos] += brandCount;
-		        		if( bcount[bpos] > 10 ) // good enough
-		        		{
-		        			brand = bs.getString(1);
-		        			brandFound = true;
+		        		if( !reserved(s) ) {
+			        		Pattern p1 = Pattern.compile(s);
+			        		Matcher m1 = p1.matcher(line);
+			        		int brandCount = 0;
+			        		while(m1.find())
+			        			brandCount +=1;
+			        		bcount[bpos] += brandCount;
+			        		if( bcount[bpos] > 10 ) // good enough
+			        		{
+			        			brand = bs.getString(1);
+			        			brandFound = true;
+			        		}
+			        		
+			        		if( bcount[bpos] > bestCount )
+			        		{
+			        			bestCount = bcount[bpos];
+			        			brand = bs.getString(1);
+			        		}
+			        		bpos +=1;
 		        		}
-		        		
-		        		if( bcount[bpos] > bestCount )
-		        		{
-		        			bestCount = bcount[bpos];
-		        			brand = bs.getString(1);
-		        		}
-		        		bpos +=1;
 		        	} while( !brandFound && bs.moveToNext() );
 	        	}
 	        	
@@ -140,6 +145,17 @@ public class HttpHelper {
 			return res;
 		}
 		
+	}
+	
+	private boolean reserved(String s)
+	{
+		String sl = s.toLowerCase(Locale.ENGLISH);
+		final String[] reservedWords = {"liqueur", "liqour"};
+		for(String rw : reservedWords)
+			if(sl.equals(rw))
+				return true;
+		
+		return false;
 	}
 	
 	public Result getDetails( String upc )

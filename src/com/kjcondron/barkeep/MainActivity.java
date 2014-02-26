@@ -9,7 +9,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.Log;
@@ -149,7 +148,6 @@ public class MainActivity extends FragmentActivity {
 					
 					@Override
 					public void onPageSelected(int arg0) {
-						// TODO Auto-generated method stub
 						BARID = mPagerAdapter.getId(arg0);
 					}
 					
