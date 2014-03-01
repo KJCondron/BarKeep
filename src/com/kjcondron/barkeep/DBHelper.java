@@ -210,7 +210,7 @@ public class DBHelper extends SQLiteAssetHelper  {
 	{
 		try{
 			SQLiteDatabase db = getReadableDatabase();
-	        String sql = "select * from vInventory where bar_id=" + barID;
+	        String sql = "select * from vInventory where bar_id=" + barID +" order by _id desc";
 	        Cursor c = db.rawQuery(sql, null);
 	        c.moveToFirst();
 	        return c;

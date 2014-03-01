@@ -23,7 +23,8 @@ import android.widget.Toast;
 public class ShopActivity extends Activity {
 
 	private Boolean gridView = false;
-	private AlertDialog.Builder mbuilder; 
+	private AlertDialog.Builder mbuilder;
+	private int mItemLayoutID = R.layout.layout_inv_item_for_list;
 	
 	private DBHelper mdb; 
 	@Override
@@ -31,7 +32,6 @@ public class ShopActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		mdb = new DBHelper(this);
 		mbuilder = new AlertDialog.Builder(this); 
-
 
 		// Show the Up button in the action bar.
 		setupActionBar();
@@ -44,13 +44,12 @@ public class ShopActivity extends Activity {
 		super.onResume();
 		setupView(gridView);
 	}
-
 	
 	protected void setupView(Boolean gv)
 	{
 		AbsListView v = gv ? 
-				getLGView(R.layout.layout_inventory_grid_view, R.id.gridview) :
-				getLGView(R.layout.layout_inventory_list_view, R.id.listview); 
+				getLGView(R.layout.layout_inventory_grid_view, R.id.gridview, R.layout.layout_inv_item_for_grid) :
+				getLGView(R.layout.layout_inventory_list_view, R.id.listview, R.layout.layout_inv_item_for_list); 
 		try
 		{
 			SimpleCursorAdapter invAdapter = getShoppingList();
@@ -58,16 +57,16 @@ public class ShopActivity extends Activity {
 		}
 		catch(Exception e)
 		{
-			Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+			MainActivity.log_exception(this, e, "ShopActivity.setupView");
 		}
 	}
 	
 	
-	protected AbsListView getLGView(int layoutId, int viewID)
+	protected AbsListView getLGView(int layoutId, int viewID, int itemLayoutID)
 	{
 		setContentView(layoutId);
-		AbsListView view =  (AbsListView) findViewById(viewID);
-		
+		mItemLayoutID = itemLayoutID;
+		final AbsListView view =  (AbsListView) findViewById(viewID);
 		try{
 		final Context c = this;
 		view.setOnItemClickListener(new OnItemClickListener() {
@@ -171,7 +170,7 @@ public class ShopActivity extends Activity {
 	    
 	    SimpleCursorAdapter shopAdapter = new SimpleCursorAdapter(
 	    		this, 
-	    		R.layout.layout_inventory_item,
+	    		mItemLayoutID,
 	    		c, 
 	    		coulmnNames,
 	    		new int[] { R.id.textView1, R.id.textView2,R.id.textView3 },

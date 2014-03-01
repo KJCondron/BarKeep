@@ -1,4 +1,4 @@
-package com.kjcondron.barkeep;
+/*package com.kjcondron.barkeep;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -42,7 +42,7 @@ public class FrontPageGestureListener extends SimpleOnGestureListener {
 			mView.setOutAnimation(mContext, android.R.anim.fade_out);
 		}
 		
-		/*if(mNewBar)
+		if(mNewBar)
 		{
 			mts.setText( "New Bar" );
 			mBars.moveToFirst();
@@ -55,7 +55,7 @@ public class FrontPageGestureListener extends SimpleOnGestureListener {
 			MainActivity.BARID = mBars.getInt(0);
 			if(!mBars.moveToNext())
 				mNewBar = true;
-		}*/
+		}
 		
 		return false;
 	}
@@ -68,3 +68,4 @@ public class FrontPageGestureListener extends SimpleOnGestureListener {
 	}
 
 }
+*/

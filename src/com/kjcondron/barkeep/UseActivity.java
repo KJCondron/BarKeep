@@ -26,6 +26,7 @@ public class UseActivity extends Activity {
 
 	private Boolean gridView = false;
 	private AlertDialog.Builder mbuilder; 
+	private int mItemLayoutID = R.layout.layout_inv_item_for_list;
 	
 	private DBHelper mdb; 
 	@Override
@@ -49,8 +50,8 @@ public class UseActivity extends Activity {
 	protected void setupView(Boolean gv)
 	{
 		AbsListView v = gv ? 
-				getLGView(R.layout.layout_inventory_grid_view, R.id.gridview) :
-				getLGView(R.layout.layout_inventory_list_view, R.id.listview); 
+				getLGView(R.layout.layout_inventory_grid_view, R.id.gridview, R.layout.layout_inv_item_for_grid) :
+				getLGView(R.layout.layout_inventory_list_view, R.id.listview, R.layout.layout_inv_item_for_list); 
 		try
 		{
 			SimpleCursorAdapter invAdapter = getInvetory();
@@ -63,10 +64,12 @@ public class UseActivity extends Activity {
 	}
 	
 	
-	protected AbsListView getLGView(int layoutId, int viewID)
+	protected AbsListView getLGView(int layoutId, int viewID, int itemLayoutID)
 	{
 		setContentView(layoutId);
+		mItemLayoutID = itemLayoutID;
 		final AbsListView view = (AbsListView) findViewById(viewID);
+		try{
 		view.setOnItemClickListener(new OnItemClickListener() {
 	        
 			public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
@@ -111,6 +114,11 @@ public class UseActivity extends Activity {
 				return false;
 			}
 		});
+		}
+		catch(Exception e)
+		{
+			MainActivity.log_exception(this, e, "ShopActicity.getLGView");
+		}
 	        
 	    return view;
 	}
@@ -183,7 +191,7 @@ public class UseActivity extends Activity {
 	    
 	    InventoryAdapter invAdapter = new InventoryAdapter(
 	    		this, 
-	    		R.layout.layout_inventory_item,
+	    		mItemLayoutID,
 	    		c, 
 	    		coulmnNames,
 	    		new int[] { R.id.textView1, R.id.textView2,R.id.textView3 },
