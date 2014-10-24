@@ -427,6 +427,16 @@ public class DBHelper extends SQLiteAssetHelper  {
 		}
 	}
 	
+	public Cursor searchBrands( String term )
+	{
+		SQLiteDatabase db = getReadableDatabase();
+        
+		String sql ="select * from vProduct where product_type like '% " + term + "%'";
+        Cursor c2 = db.rawQuery(sql, null);
+   
+        c2.moveToFirst();
+        return c2;
+	}
 	
 	public void saveDB(Context context)
 	{

@@ -3,6 +3,8 @@ package com.kjcondron.barkeep;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Paint;
+import android.net.Uri;
+import android.os.Environment;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -19,6 +21,7 @@ public class InventoryAdapter extends SimpleCursorAdapter {
 	protected int brandColId;
 	protected int prodColId;
 	protected int sizeColId;
+	protected int typeColId;
 	
 	
 	public InventoryAdapter(
@@ -38,15 +41,10 @@ public class InventoryAdapter extends SimpleCursorAdapter {
 		brandColId = cursor.getColumnIndexOrThrow(colNames[0]);
 		prodColId  = cursor.getColumnIndexOrThrow(colNames[1]);
 		sizeColId  = cursor.getColumnIndexOrThrow(colNames[2]);
+		typeColId  = cursor.getColumnIndexOrThrow(colNames[3]);
 		mQuantityId = quantityTo;
 	}
-	
-/*	@Override
-	public View newView(Context ctxt, Cursor cursor, ViewGroup parent)
-	{
-		return super.newView(ctxt, cursor, parent);
-	}*/
-	
+		
 	public void bindView(View view, Context context, Cursor cursor)
 	{
 		sbindView(view, context, cursor);
@@ -65,15 +63,20 @@ public class InventoryAdapter extends SimpleCursorAdapter {
 		final TextView bv = (TextView)view.findViewById(to[0]);
 		final TextView pv = (TextView)view.findViewById(to[1]);
 		final TextView sv = (TextView)view.findViewById(to[2]);
+		final ImageView iv = (ImageView)view.findViewById(to[3]);
 		
 		String bText = cursor.getString(brandColId);
 		String pText = cursor.getString(prodColId);
 		String sText = cursor.getString(sizeColId);
+		String tText = cursor.getString(typeColId);
 		
+		String imagePath = "/storage/emulated/0/images/" + tText + ".jpg";
+		                    
 		float h = p.measureText(bText + pText);
 		setViewText(bv, bText);
 		setViewText(pv, pText);
 		setViewText(sv, sText);
+		setViewImage(iv, imagePath);
 		
 	}
 

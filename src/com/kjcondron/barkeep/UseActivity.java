@@ -3,6 +3,8 @@ package com.kjcondron.barkeep;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -19,6 +21,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
@@ -137,6 +140,15 @@ public class UseActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.use, menu);
+		
+		// Associate searchable configuration with the SearchView
+	    SearchManager searchManager =
+	           (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+	    SearchView searchView =
+	            (SearchView) menu.findItem(R.id.search).getActionView();
+	    searchView.setSearchableInfo(
+	            searchManager.getSearchableInfo(getComponentName()));
+	    
 		return true;
 	}
 
@@ -179,13 +191,30 @@ public class UseActivity extends Activity {
 			Intent cintent = new Intent(this, MainActivity.class);
 			startActivity(cintent);
 			return true;
+		case R.id.menu_search:
+			doSearch();
+			Intent sintent = new Intent(this, SearchActivity.class);
+			//startActivity(sintent);
+			return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}
 	
+	protected void doSearch(){
+		// hide action bar
+		getActionBar().hide();
+		
+		// display a text view where the action bar used to be
+		
+		// get text input
+		
+		// search and display results in new activity
+		
+	}
+	
 	protected SimpleCursorAdapter getInvetory() throws Exception
 	{
-		String[] coulmnNames = new String[]{ "brand", "product_name", "size" };
+		String[] coulmnNames = new String[]{ "brand", "product_name", "size", "product_type" };
 	    Cursor c = mdb.getInventory(MainActivity.BARID);
 	    c.moveToFirst();
 	    
@@ -194,7 +223,7 @@ public class UseActivity extends Activity {
 	    		mItemLayoutID,
 	    		c, 
 	    		coulmnNames,
-	    		new int[] { R.id.textView1, R.id.textView2,R.id.textView3 },
+	    		new int[] { R.id.textView1, R.id.textView2,R.id.textView3,R.id.itemImageView },
 	    		CursorAdapter.NO_SELECTION,
 	    		R.id.progressBar1);
 	    
