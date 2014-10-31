@@ -1,27 +1,20 @@
 package com.kjcondron.barkeep;
 
-import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.GridView;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.CursorAdapter;
+import android.widget.SimpleCursorAdapter;
 
-public class SearchActivity extends Activity {
+public class SearchActivity extends DisplayActivity {
 
-	/** Called when the activity is first created. */
+	private String mQuery;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-	    super.onCreate(savedInstanceState);
-	
-	    //setContentView(R.layout.layout_search);
-	    
-	    Toast.makeText(this, "search activity started ", Toast.LENGTH_LONG).show();
-	    
 	    handleIntent(getIntent());
-	    
+	    super.onCreate(savedInstanceState);
 	}
 	
 	@Override
@@ -29,27 +22,30 @@ public class SearchActivity extends Activity {
         handleIntent(intent);
     }
 
-	
-	public void search(View view) {
-		
-		TextView srchField = (TextView) findViewById(R.id.searchField);
-		String srchVal = srchField.getText().toString();
-		
-		Toast.makeText(this, "searched for " + srchVal, Toast.LENGTH_LONG).show();
-		finish();
-	}
-	
 	private void handleIntent(Intent intent) {
 
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String query = intent.getStringExtra(SearchManager.QUERY);
-            //use the query to search your data somehow
-            Toast.makeText(this, "search intent " + query, Toast.LENGTH_LONG).show();
-    	    
+            mQuery = intent.getStringExtra(SearchManager.QUERY);
         }
-        
-        finish();
     }
-
-
+	
+	protected SimpleCursorAdapter getInvetory(DBHelper db, int itemLayoutID) throws Exception
+	{
+		String[] coulmnNames = new String[]{ "brand", "product_name", "size", "product_type" };
+	    Cursor c = db.searchBrands(mQuery, MainActivity.BARID);
+	    c.moveToFirst();
+	    
+	    InventoryAdapter invAdapter = new InventoryAdapter(
+	    		this, 
+	    		itemLayoutID,
+	    		c, 
+	    		coulmnNames,
+	    		new int[] { R.id.textView1, R.id.textView2,R.id.textView3,R.id.itemImageView },
+	    		CursorAdapter.NO_SELECTION,
+	    		R.id.progressBar1);
+	    
+	   
+	    return invAdapter;
+	}
+	
 }

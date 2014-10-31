@@ -14,6 +14,6 @@
     <string name="search_title">search</string>
     <string name="title_activity_search">Search</string>
     <string name="search_label">Search Label</string>
-    <string name="search_hint">Search Hint</string>
+    <string name="search_hint">Enter Keyword</string>
 
 </resources>

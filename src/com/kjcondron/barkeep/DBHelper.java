@@ -10,6 +10,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
+import android.widget.Toast;
 
 import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 
@@ -427,12 +428,13 @@ public class DBHelper extends SQLiteAssetHelper  {
 		}
 	}
 	
-	public Cursor searchBrands( String term )
+	public Cursor searchBrands( String term, int barId )
 	{
 		SQLiteDatabase db = getReadableDatabase();
         
-		String sql ="select * from vProduct where product_type like '% " + term + "%'";
-        Cursor c2 = db.rawQuery(sql, null);
+		//String sql ="select * from vProducts where brand like '% " + term + "%'";
+		String sql = "select * from vInventory where bar_id=" + barId + " and brand like '%" + term + "%'";
+		Cursor c2 = db.rawQuery(sql, null);
    
         c2.moveToFirst();
         return c2;
