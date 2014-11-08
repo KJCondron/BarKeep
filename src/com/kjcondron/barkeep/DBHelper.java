@@ -12,6 +12,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 import android.widget.Toast;
 
+import com.kjcondron.barkeep.SearchActivity.SrchTyp;
 import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 
 public class DBHelper extends SQLiteAssetHelper  {
@@ -428,15 +429,77 @@ public class DBHelper extends SQLiteAssetHelper  {
 		}
 	}
 	
-	public Cursor searchBrands( String term, int barId )
+	public Cursor search( String term, SrchTyp type )
 	{
 		SQLiteDatabase db = getReadableDatabase();
         
-		//String sql ="select * from vProducts where brand like '% " + term + "%'";
-		String sql = "select * from vInventory where bar_id=" + barId + " and brand like '%" + term + "%'";
+		final String sBrands = String.format(
+				"select * from vProducts where brand like \"%%s%\"", term);
+		
+		final String sProduct = String.format(
+				"select * from vProducts where product_name like \"%%s%\"", term);
+		
+		final String sAll = sBrands + " union " + sProduct; 
+		
+		/*String sql = "select * from vInventory where bar_id=" + barId +
+				" and brand like \"%" + term + "%\"" +
+				" union select * from vInventory where bar_id=" + barId +
+				" and product_name like \"%" + term + "%\"";*/
+		
+		String sql = "";
+		switch(type){
+		case ALL:
+			sql = sAll;
+			break;
+		case PRODUCTS:
+			sql = sProduct;
+			break;
+		case BRANDS:
+			sql = sBrands;
+			break;
+		}
+				
 		Cursor c2 = db.rawQuery(sql, null);
-   
-        c2.moveToFirst();
+		c2.moveToFirst();
+        return c2;
+	}
+	
+	
+	public Cursor search( String term, SrchTyp type, int barId )
+	{
+		SQLiteDatabase db = getReadableDatabase();
+        
+		final String sBrands = String.format(
+				"select * from vInventory where bar_id=%d and brand like \"%%%s%%\"",
+				barId, term);
+		
+		final String sProduct = String.format(
+				"select * from vInventory where bar_id=%d and product_name like \"%%%s%%\"",
+				barId, term);
+		
+		final String sAll = sBrands + " union " + sProduct; 
+		
+		
+		/*String sql = "select * from vInventory where bar_id=" + barId +
+				" and brand like \"%" + term + "%\"" +
+				" union select * from vInventory where bar_id=" + barId +
+				" and product_name like \"%" + term + "%\"";*/
+		
+		String sql = "";
+		switch(type){
+		case ALL:
+			sql = sAll;
+			break;
+		case PRODUCTS:
+			sql = sProduct;
+			break;
+		case BRANDS:
+			sql = sBrands;
+			break;
+		}
+				
+		Cursor c2 = db.rawQuery(sql, null);
+		c2.moveToFirst();
         return c2;
 	}
 	

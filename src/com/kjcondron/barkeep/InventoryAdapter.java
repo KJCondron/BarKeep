@@ -76,7 +76,8 @@ public class InventoryAdapter extends SimpleCursorAdapter {
 		setViewText(bv, bText);
 		setViewText(pv, pText);
 		setViewText(sv, sText);
-		setViewImage(iv, imagePath);
+		if(null != iv)
+			setViewImage(iv, imagePath);
 		
 	}
 

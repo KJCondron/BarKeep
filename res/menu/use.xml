@@ -32,9 +32,10 @@
         android:title="save db"/>
           
      <!-- android:icon="@drawable/ic_search" -->
+     <!-- android:actionViewClass="android.widget.SearchViewt" -->
      <item android:id="@+id/search"
           android:title="@string/search_title"
           android:showAsAction="collapseActionView"
-          android:actionViewClass="android.widget.SearchView" />
+          android:actionViewClass="com.kjcondron.barkeep.BKSeachWidget" />
 
 </menu>
