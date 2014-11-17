@@ -29,14 +29,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.kjcondron.barkeep.DisplayMessageActivity"
-            android:label="@string/title_activity_display_message"
-            android:parentActivityName="com.kjcondron.barkeep.MainActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.kjcondron.barkeep.MainActivity" />
-        </activity>
-        <activity
             android:name="com.kjcondron.barkeep.AddActivity"
             android:label="@string/title_activity_add"
             android:parentActivityName="com.kjcondron.barkeep.MainActivity" >
