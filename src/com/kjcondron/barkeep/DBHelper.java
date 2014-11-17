@@ -429,46 +429,31 @@ public class DBHelper extends SQLiteAssetHelper  {
 		}
 	}
 	
-	public Cursor search( String term, SrchTyp type )
+	public Cursor searchProds( String term, SrchTyp type )
 	{
-		SQLiteDatabase db = getReadableDatabase();
-        
 		final String sBrands = String.format(
-				"select * from vProducts where brand like \"%%s%\"", term);
+				"select * from vProducts where brand like \"%%%s%%\"", term);
 		
 		final String sProduct = String.format(
-				"select * from vProducts where product_name like \"%%s%\"", term);
+				"select * from vProducts where product_name like \"%%%s%%\"", term);
 		
-		final String sAll = sBrands + " union " + sProduct; 
-		
-		/*String sql = "select * from vInventory where bar_id=" + barId +
-				" and brand like \"%" + term + "%\"" +
-				" union select * from vInventory where bar_id=" + barId +
-				" and product_name like \"%" + term + "%\"";*/
-		
-		String sql = "";
-		switch(type){
-		case ALL:
-			sql = sAll;
-			break;
-		case PRODUCTS:
-			sql = sProduct;
-			break;
-		case BRANDS:
-			sql = sBrands;
-			break;
-		}
-				
-		Cursor c2 = db.rawQuery(sql, null);
-		c2.moveToFirst();
-        return c2;
+		return search( sBrands, sProduct, type);
 	}
 	
 	
+	public Cursor searchBars( String term, SrchTyp type )
+	{
+		final String sBrands = String.format(
+				"select * from vInventory where brand like \"%%%s%%\"", term);
+		
+		final String sProduct = String.format(
+				"select * from vInventory where product_name like \"%%%s%%\"", term);
+		
+		return search( sBrands, sProduct, type);
+	}
+	
 	public Cursor search( String term, SrchTyp type, int barId )
 	{
-		SQLiteDatabase db = getReadableDatabase();
-        
 		final String sBrands = String.format(
 				"select * from vInventory where bar_id=%d and brand like \"%%%s%%\"",
 				barId, term);
@@ -476,14 +461,14 @@ public class DBHelper extends SQLiteAssetHelper  {
 		final String sProduct = String.format(
 				"select * from vInventory where bar_id=%d and product_name like \"%%%s%%\"",
 				barId, term);
-		
-		final String sAll = sBrands + " union " + sProduct; 
-		
-		
-		/*String sql = "select * from vInventory where bar_id=" + barId +
-				" and brand like \"%" + term + "%\"" +
-				" union select * from vInventory where bar_id=" + barId +
-				" and product_name like \"%" + term + "%\"";*/
+				
+		return search( sBrands, sProduct, type);
+	}
+	
+	public Cursor search( String bSQL, String pSQL, SrchTyp type )
+	{
+		SQLiteDatabase db = getReadableDatabase();
+		final String sAll = bSQL + " union " + pSQL; 
 		
 		String sql = "";
 		switch(type){
@@ -491,16 +476,17 @@ public class DBHelper extends SQLiteAssetHelper  {
 			sql = sAll;
 			break;
 		case PRODUCTS:
-			sql = sProduct;
+			sql = pSQL;
 			break;
 		case BRANDS:
-			sql = sBrands;
+			sql = bSQL;
 			break;
 		}
 				
 		Cursor c2 = db.rawQuery(sql, null);
 		c2.moveToFirst();
         return c2;
+	
 	}
 	
 	public void saveDB(Context context)
