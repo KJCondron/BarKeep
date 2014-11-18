@@ -38,13 +38,13 @@
         android:id="@+id/cbxAllBars"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/all_bars" />
+        android:text="All Bars" />
     
     <CheckBox
         android:id="@+id/cbxAllProds"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/all_prods" />
+        android:text="All Products" />
 
     </LinearLayout>
      
