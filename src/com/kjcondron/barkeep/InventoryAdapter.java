@@ -1,7 +1,14 @@
 package com.kjcondron.barkeep;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import android.app.ActivityManager;
+import android.app.ActivityManager.MemoryInfo;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Environment;
@@ -23,6 +30,11 @@ public class InventoryAdapter extends SimpleCursorAdapter {
 	protected int sizeColId;
 	protected int typeColId;
 	
+	private int imageCount = 0;
+	
+	private Context mCtxt;
+	
+	private Map<String, Bitmap> bmCache;
 	
 	public InventoryAdapter(
 			Context ctxt,
@@ -35,6 +47,7 @@ public class InventoryAdapter extends SimpleCursorAdapter {
 			)
 	{
 		super(ctxt, layout, cursor, colNames, to, flag);
+		mCtxt = ctxt;
 		// TODO assert to.length == 3
 		// TODO assert colNames.length == 3
 		mTo = to;
@@ -43,6 +56,8 @@ public class InventoryAdapter extends SimpleCursorAdapter {
 		sizeColId  = cursor.getColumnIndexOrThrow(colNames[2]);
 		typeColId  = cursor.getColumnIndexOrThrow(colNames[3]);
 		mQuantityId = quantityTo;
+		
+		bmCache = new HashMap<String, Bitmap>();
 	}
 		
 	public void bindView(View view, Context context, Cursor cursor)
@@ -76,9 +91,95 @@ public class InventoryAdapter extends SimpleCursorAdapter {
 		setViewText(bv, bText);
 		setViewText(pv, pText);
 		setViewText(sv, sText);
-		if(null != iv)
-			setViewImage(iv, imagePath);
+		safeSetImage(iv, imagePath);
+		//setViewImage(iv, imagePath);
+	}
+	
+	@Override
+	public void setViewImage(ImageView iv, String path)
+	{
 		
+		++imageCount;
+		
+		try{
+			//MainActivity.logHeap(getClass());
+			super.setViewImage(iv, path);	
+		}
+		catch(java.lang.OutOfMemoryError oom){
+			MemoryInfo mi = new MemoryInfo();
+			ActivityManager activityManager = (ActivityManager) mCtxt.getSystemService(Context.ACTIVITY_SERVICE);
+			activityManager.getMemoryInfo(mi);
+			long availableMegs = mi.availMem / 1048576L;
+			MainActivity.log_info(null, "setViewImage:" + imageCount, "InventoryAdapter");
+			MainActivity.log_info(null, path, "InventoryAdapter");
+			MainActivity.log_info(null, "avail mem: " + availableMegs, "InventoryAdapter");
+		}
+	}
+	
+	protected void safeSetImage(ImageView iv, String path)
+	{
+		//MainActivity.logHeap(getClass());
+		// TODO use bitmap decoder to size image and set it, or 
+		// maybe a LRU cache if we are going to allow image per
+		// item
+				
+		if(!bmCache.containsKey(path))
+		{
+			Bitmap bm = BitmapFactory.decodeFile(path);
+			/*MainActivity.log_info(null, "setImageView path: " + path, "InventoryAdapter");
+			MainActivity.log_info(null, "setImageView abc: " + bm.getAllocationByteCount(), "InventoryAdapter");
+			MainActivity.log_info(null, "setImageView bc: " + bm.getByteCount(), "InventoryAdapter");
+			
+			Bitmap bm2 = decodeSampledBitmapFromPath(path, iv.getWidth(), iv.getHeight());
+			
+			MainActivity.log_info(null, "setImageView path: " + path, "InventoryAdapter");
+			MainActivity.log_info(null, "setImageView abc: " + bm2.getAllocationByteCount(), "InventoryAdapter");
+			MainActivity.log_info(null, "setImageView bc: " + bm2.getByteCount(), "InventoryAdapter");
+			*/
+			bmCache.put(path, bm);
+		}
+		
+		if(null != iv)
+			iv.setImageBitmap(bmCache.get(path));
+	}
+	
+	public static int calculateInSampleSize(
+            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+	    // Raw height and width of image
+	    final int height = options.outHeight;
+	    final int width = options.outWidth;
+	    int inSampleSize = 1;
+	
+	    if (height > reqHeight || width > reqWidth) {
+	
+	        final int halfHeight = height / 2;
+	        final int halfWidth = width / 2;
+	
+	        // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+	        // height and width larger than the requested height and width.
+	        while ((halfHeight / inSampleSize) > reqHeight
+	                && (halfWidth / inSampleSize) > reqWidth) {
+	            inSampleSize *= 2;
+	        }
+	    }
+	
+    	return inSampleSize;
+	}
+	
+	public static Bitmap decodeSampledBitmapFromPath(String path, 
+	        int reqWidth, int reqHeight) {
+
+	    // First decode with inJustDecodeBounds=true to check dimensions
+	    final BitmapFactory.Options options = new BitmapFactory.Options();
+	    options.inJustDecodeBounds = true;
+	    BitmapFactory.decodeFile(path, options);
+
+	    // Calculate inSampleSize
+	    options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+
+	    // Decode bitmap with inSampleSize set
+	    options.inJustDecodeBounds = false;
+	    return BitmapFactory.decodeFile(path, options);
 	}
 
 }

@@ -15,11 +15,14 @@
     <string name="title_activity_ad_vsrch">Advanced Search</string>
     <string name="all_bars">All Bars</string>
     <string name="all_prods">All Products</string>
+
     <string-array name="search_types_array">
         <item>All</item>
         <item>Brands</item>
         <item>Product Name</item>
     </string-array>
-    
+
+    <string name="title_activity_full_screen_scroll">FullScreenScrollActivity</string>
+    <string name="hello_world">Hello world!</string>
 
 </resources>

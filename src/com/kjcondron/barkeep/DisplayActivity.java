@@ -28,7 +28,6 @@ public abstract class DisplayActivity extends Activity {
 
 	private Boolean gridView = false;
 	private AlertDialog.Builder mbuilder; 
-	private int mItemLayoutID = R.layout.layout_inv_item_for_list;
 	MenuItem mSearchMenuItem;
 	
 	private DBHelper mdb; 
@@ -55,12 +54,15 @@ public abstract class DisplayActivity extends Activity {
 	
 	protected void setupView(Boolean gv)
 	{
-		AbsListView v = gv ? 
-				getLGView(R.layout.layout_inventory_grid_view, R.id.gridview, R.layout.layout_inv_item_for_grid) :
-				getLGView(R.layout.layout_inventory_list_view, R.id.listview, R.layout.layout_inv_item_for_list); 
+		int layout = gv ? R.layout.layout_inventory_grid_view : R.layout.layout_inventory_list_view;
+		int viewId = gv ? R.id.gridview : R.id.listview;
+		int itemLayout = gv ? R.layout.layout_inv_item_for_grid : R.layout.layout_inv_item_for_list;
+		
+		AbsListView v = getLGView(layout, viewId, itemLayout); 
+		
 		try
 		{
-			v.setAdapter(getInvetory(mdb, mItemLayoutID));
+			v.setAdapter(getInvetory(mdb, itemLayout));
 		}
 		catch(Exception e)
 		{
@@ -72,7 +74,6 @@ public abstract class DisplayActivity extends Activity {
 	protected AbsListView getLGView(int layoutId, int viewID, int itemLayoutID)
 	{
 		setContentView(layoutId);
-		mItemLayoutID = itemLayoutID;
 		final AbsListView view = (AbsListView) findViewById(viewID);
 		try{
 		view.setOnItemClickListener(new OnItemClickListener() {

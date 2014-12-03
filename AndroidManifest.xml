@@ -86,7 +86,7 @@
 
                 <!-- Change this to be db- followed by your app key -->
                 <data android:scheme="db-6l5plk28ag6lik9" />
- is app key right?
+ is app key right?
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.BROWSABLE" />
@@ -97,6 +97,14 @@
             android:name="com.kjcondron.barkeep.AdVSrchActivity"
             android:label="@string/title_activity_ad_vsrch"
             android:theme="@android:style/Theme.Dialog" >
+        </activity>
+        <activity
+            android:name="com.kjcondron.barkeep.FullScreenPagerActivity"
+            android:label="@string/title_activity_full_screen_scroll"
+            android:parentActivityName="com.kjcondron.barkeep.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.kjcondron.barkeep.MainActivity" />
         </activity>
     </application>
 

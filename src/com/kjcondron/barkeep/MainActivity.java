@@ -1,9 +1,12 @@
 package com.kjcondron.barkeep;
 
+import java.text.DecimalFormat;
+
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Debug;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -22,6 +25,8 @@ import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 public class MainActivity extends FragmentActivity {
+	
+	public final static String APP = "BARKEEP";
 	
 	private class BarScrollAdapter extends FragmentStatePagerAdapter {
 		
@@ -94,6 +99,27 @@ public class MainActivity extends FragmentActivity {
 	    return false;
 	}
 	
+	public static void logHeap(Class clazz) {
+		
+		final String app_package = "com.kjcondron.barkeep.";
+	    Double allocated = new Double(Debug.getNativeHeapAllocatedSize())/new Double((1048576));
+	    Double available = new Double(Debug.getNativeHeapSize())/1048576.0;
+	    Double free = new Double(Debug.getNativeHeapFreeSize())/1048576.0;
+	    DecimalFormat df = new DecimalFormat();
+	    df.setMaximumFractionDigits(2);
+	    df.setMinimumFractionDigits(2);
+
+	    Log.d(APP + " MEM", "debug. =================================");
+	    Log.d(APP + " MEM", "debug.heap native: allocated " + df.format(allocated) + "MB of " + df.format(available) + "MB (" + df.format(free) + "MB free) in [" + clazz.getName().replaceAll(app_package,"") + "]");
+	    Log.d(APP + " MEM", "debug.memory: allocated: " + df.format(new Double(Runtime.getRuntime().totalMemory()/1048576)) + "MB of " + df.format(new Double(Runtime.getRuntime().maxMemory()/1048576))+ "MB (" + df.format(new Double(Runtime.getRuntime().freeMemory()/1048576)) +"MB free)");
+	    System.gc();
+	    System.gc();
+
+	    // don't need to add the following lines, it's just an app specific handling in my app        
+	    //if (allocated>=(new Double(Runtime.getRuntime().maxMemory())/new Double((1048576))-MEMORY_BUFFER_LIMIT_FOR_RESTART)) {
+	      //  android.os.Process.killProcess(android.os.Process.myPid());
+	}
+	
 	public static void log_exception(Context c, Exception e, String fromWhere)
 	{
 		log_message(c, e.getMessage(), fromWhere);
@@ -120,9 +146,18 @@ public class MainActivity extends FragmentActivity {
 	
 	public static void log_message(Context c, String s, String fromWhere)
 	{
-		if(s != null ){
-		Log.e("barkeep", s);
-		if(c!=null)
+		if( s != null ){
+			Log.e("barkeep", s);
+		if( c!=null )
+			Toast.makeText(c, s, Toast.LENGTH_LONG).show();
+		}
+	}
+	
+	public static void log_info(Context c, String s, String fromWhere)
+	{
+		if( s != null ){
+			Log.i("barkeep", s);
+		if( c!=null )
 			Toast.makeText(c, s, Toast.LENGTH_LONG).show();
 		}
 	}
@@ -218,6 +253,7 @@ public class MainActivity extends FragmentActivity {
     	if(mMakeNewBar || BARID == -1)
     		makeNewBar();
     	else
+    		//startMyActvity(FullScreenPagerActivity.class);
     		startMyActvity(UseActivity.class);
     }
     

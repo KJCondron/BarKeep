@@ -11,6 +11,7 @@ public class BarScrollFragment extends Fragment {
 	
 	String mText;
 	
+	// as per android warning use default constructors plus setters!
 	public void setText( String text ) { mText = text; }
 	
 	public View onCreateView(LayoutInflater infalter, ViewGroup container,
