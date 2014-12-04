@@ -89,36 +89,28 @@ public class InventoryAdapter extends SimpleCursorAdapter {
 		// TODO use bitmap decoder to size image and set it, or 
 		// maybe a LRU cache if we are going to allow image per
 		// item. Also make it a singleton
-		
-		if(!bmCache.containsKey(path))
-		{
-			Bitmap bm = null;
-			try
-			{
-				//bm = BitmapFactory.decodeFile(path);
-				bm = decodeSampledBitmapFromPath(path, iv.getDrawable().getIntrinsicWidth(), iv.getDrawable().getIntrinsicHeight());
-			}
-			catch(OutOfMemoryError e)
-			{
-				MainActivity.log_message(null, path, "InventoryAdapter");
-				MainActivity.logHeap(getClass());
-			}
-			 
-			
-			/*MainActivity.log_info(null, "setImageView path: " + path, "InventoryAdapter");
-			MainActivity.log_info(null, "setImageView abc: " + bm.getAllocationByteCount(), "InventoryAdapter");
-			MainActivity.log_info(null, "setImageView bc: " + bm.getByteCount(), "InventoryAdapter");
-			
-			
-			MainActivity.log_info(null, "setImageView path: " + path, "InventoryAdapter");
-			MainActivity.log_info(null, "setImageView abc: " + bm2.getAllocationByteCount(), "InventoryAdapter");
-			MainActivity.log_info(null, "setImageView bc: " + bm2.getByteCount(), "InventoryAdapter");
-			*/
-			bmCache.put(path, bm);
-		}
-		
 		if(null != iv)
+		{
+		
+			if(!bmCache.containsKey(path))
+			{
+				Bitmap bm = null;
+				try
+				{
+					bm = decodeSampledBitmapFromPath(path, iv.getDrawable().getIntrinsicWidth(), iv.getDrawable().getIntrinsicHeight());
+				}
+				catch(OutOfMemoryError e)
+				{
+					MainActivity.log_message(null, path, "InventoryAdapter");
+					MainActivity.logHeap(getClass());
+				}
+		
+				bmCache.put(path, bm);
+			}
+			
 			iv.setImageBitmap(bmCache.get(path));
+		}
+			
 	}
 	
 	public static int calculateInSampleSize(

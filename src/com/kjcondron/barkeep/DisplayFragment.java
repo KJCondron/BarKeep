@@ -19,6 +19,7 @@ import android.widget.AdapterView.OnItemClickListener;
 
 public abstract class DisplayFragment extends Fragment {
 	
+	final static String VIEW_TYPE = "VIEW_TYPE";
 	private Boolean gridView = false;
 	private DBHelper mdb; 
 	private AlertDialog.Builder mbuilder; 
@@ -36,6 +37,10 @@ public abstract class DisplayFragment extends Fragment {
 		mdb = new DBHelper(this.getActivity());
 		mbuilder = new AlertDialog.Builder(this.getActivity());
 		pager = (ViewPager)container;
+		
+		Bundle bdl = super.getArguments();
+	    if(null != bdl)
+	    	gridView = bdl.getBoolean(VIEW_TYPE, false);
 		
 		try
 		{	
