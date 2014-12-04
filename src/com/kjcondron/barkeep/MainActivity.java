@@ -253,8 +253,8 @@ public class MainActivity extends FragmentActivity {
     	if(mMakeNewBar || BARID == -1)
     		makeNewBar();
     	else
-    		//startMyActvity(FullScreenPagerActivity.class);
-    		startMyActvity(UseActivity.class);
+    		startMyActvity(FullScreenPagerActivity.class);
+    		//startMyActvity(UseActivity.class);
     }
     
     public void startShop(View view) {

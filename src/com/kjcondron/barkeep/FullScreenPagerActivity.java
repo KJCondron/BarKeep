@@ -1,5 +1,6 @@
 package com.kjcondron.barkeep;
 
+import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 public class FullScreenPagerActivity extends FragmentActivity {
 	
@@ -24,6 +26,7 @@ public class FullScreenPagerActivity extends FragmentActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.layout_fullscreen_pager);
+		setupActionBar();
 		// Show the Up button in the action bar.
 		mdb = new DBHelper(this);
 		mbuilder = new AlertDialog.Builder(this); 
@@ -31,8 +34,29 @@ public class FullScreenPagerActivity extends FragmentActivity {
 		setupActionBar();
 		
 		ViewPager pager = (ViewPager) findViewById(R.id.full_screen_pager);
-		TypesScrollAdapter pagerAdapter = new TypesScrollAdapter(getSupportFragmentManager());
-		pager.setAdapter(pagerAdapter);  	
+		final TypesScrollAdapter pagerAdapter = new TypesScrollAdapter(getSupportFragmentManager());
+		pager.setAdapter(pagerAdapter);
+		pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+			
+			@Override
+			public void onPageSelected(int arg0) {
+				// TODO Auto-generated method stub
+				ActionBar bar = getActionBar();
+				bar.setTitle(pagerAdapter.getPageTitle(arg0));
+			}
+			
+			@Override
+			public void onPageScrolled(int arg0, float arg1, int arg2) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onPageScrollStateChanged(int arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 		
 	}
 
@@ -41,7 +65,9 @@ public class FullScreenPagerActivity extends FragmentActivity {
 	 */
 	private void setupActionBar() {
 
-		getActionBar().setDisplayHomeAsUpEnabled(true);
+		ActionBar bar = getActionBar();
+		bar.setTitle("Inventory");
+		bar.setDisplayHomeAsUpEnabled(true);
 
 	}
 
@@ -88,22 +114,40 @@ public class FullScreenPagerActivity extends FragmentActivity {
 		@Override
 		public Fragment getItem(int pos) {
 			if(pos > mCount) MainActivity.log_message(FullScreenPagerActivity.this, "pos greater than count", "TypesScrollAdapter.getItem");
+			
 			DisplayFragment frag = new UseFragment();
-			/*if(0 == pos)
-				bsf.setText( "All"  );
-			else {
+			if(0 != pos)
+			{
+				try
+				{
+					Bundle bdl = new Bundle();
+					bdl.putString(UseFragment.ITEM_TYPE, getPageTitle(pos));
+					frag.setArguments(bdl);			
+				}
+				catch(Exception e)
+				{
+				}
+			}
+			return frag;
+		}
+		
+		@Override
+		public String getPageTitle(int pos) {
+			String title = "Inventory";
+			if(0 != pos)
+			{
 				try
 				{
 					Cursor c = mdb.getTypes();
 					c.move(pos-1);
-					bsf.setText( c.getString(c.getColumnIndex("product_type"))  );
+					title =  c.getString(c.getColumnIndex("product_type")) ;			
 				}
 				catch(Exception e)
 				{
-					bsf.setText("Error");
 				}
-			}*/
-			return frag;
+			}
+			
+			return title;
 		}
 		
 		@Override

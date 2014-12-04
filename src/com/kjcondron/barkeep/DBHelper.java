@@ -224,6 +224,23 @@ public class DBHelper extends SQLiteAssetHelper  {
 		}
 	}
 	
+	public Cursor getInventory( int barID, String type ) throws Exception
+	{
+		try{
+			SQLiteDatabase db = getReadableDatabase();
+	        String sql = "select * from vInventory where bar_id=" + barID +
+	        		" and product_type='" + type + "' order by _id desc";
+	        Cursor c = db.rawQuery(sql, null);
+	        c.moveToFirst();
+	        return c;
+		}
+		catch(Exception e)
+		{
+			MainActivity.log_exception(m_context, e, "getInventory");
+			throw e;
+		}
+	}
+	
 	public Cursor getShoppingList( int barID ) throws Exception
 	{
 		try{

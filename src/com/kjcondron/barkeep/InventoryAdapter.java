@@ -30,10 +30,6 @@ public class InventoryAdapter extends SimpleCursorAdapter {
 	protected int sizeColId;
 	protected int typeColId;
 	
-	private int imageCount = 0;
-	
-	private Context mCtxt;
-	
 	private Map<String, Bitmap> bmCache;
 	
 	public InventoryAdapter(
@@ -47,7 +43,6 @@ public class InventoryAdapter extends SimpleCursorAdapter {
 			)
 	{
 		super(ctxt, layout, cursor, colNames, to, flag);
-		mCtxt = ctxt;
 		// TODO assert to.length == 3
 		// TODO assert colNames.length == 3
 		mTo = to;
@@ -92,45 +87,33 @@ public class InventoryAdapter extends SimpleCursorAdapter {
 		setViewText(pv, pText);
 		setViewText(sv, sText);
 		safeSetImage(iv, imagePath);
-		//setViewImage(iv, imagePath);
-	}
-	
-	@Override
-	public void setViewImage(ImageView iv, String path)
-	{
-		
-		++imageCount;
-		
-		try{
-			//MainActivity.logHeap(getClass());
-			super.setViewImage(iv, path);	
-		}
-		catch(java.lang.OutOfMemoryError oom){
-			MemoryInfo mi = new MemoryInfo();
-			ActivityManager activityManager = (ActivityManager) mCtxt.getSystemService(Context.ACTIVITY_SERVICE);
-			activityManager.getMemoryInfo(mi);
-			long availableMegs = mi.availMem / 1048576L;
-			MainActivity.log_info(null, "setViewImage:" + imageCount, "InventoryAdapter");
-			MainActivity.log_info(null, path, "InventoryAdapter");
-			MainActivity.log_info(null, "avail mem: " + availableMegs, "InventoryAdapter");
-		}
 	}
 	
 	protected void safeSetImage(ImageView iv, String path)
 	{
-		//MainActivity.logHeap(getClass());
 		// TODO use bitmap decoder to size image and set it, or 
 		// maybe a LRU cache if we are going to allow image per
-		// item
-				
+		// item. Also make it a singleton
+		
 		if(!bmCache.containsKey(path))
 		{
-			Bitmap bm = BitmapFactory.decodeFile(path);
+			Bitmap bm = null;
+			try
+			{
+				//bm = BitmapFactory.decodeFile(path);
+				bm = decodeSampledBitmapFromPath(path, iv.getDrawable().getIntrinsicWidth(), iv.getDrawable().getIntrinsicHeight());
+			}
+			catch(OutOfMemoryError e)
+			{
+				MainActivity.log_message(null, path, "InventoryAdapter");
+				MainActivity.logHeap(getClass());
+			}
+			 
+			
 			/*MainActivity.log_info(null, "setImageView path: " + path, "InventoryAdapter");
 			MainActivity.log_info(null, "setImageView abc: " + bm.getAllocationByteCount(), "InventoryAdapter");
 			MainActivity.log_info(null, "setImageView bc: " + bm.getByteCount(), "InventoryAdapter");
 			
-			Bitmap bm2 = decodeSampledBitmapFromPath(path, iv.getWidth(), iv.getHeight());
 			
 			MainActivity.log_info(null, "setImageView path: " + path, "InventoryAdapter");
 			MainActivity.log_info(null, "setImageView abc: " + bm2.getAllocationByteCount(), "InventoryAdapter");
