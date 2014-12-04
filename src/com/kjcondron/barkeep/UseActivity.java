@@ -4,7 +4,6 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.widget.CursorAdapter;
 import android.widget.SimpleCursorAdapter;
-import android.widget.Toast;
 
 public class UseActivity extends DisplayActivity {
 	

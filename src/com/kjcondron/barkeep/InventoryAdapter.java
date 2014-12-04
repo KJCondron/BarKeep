@@ -3,17 +3,12 @@ package com.kjcondron.barkeep;
 import java.util.HashMap;
 import java.util.Map;
 
-import android.app.ActivityManager;
-import android.app.ActivityManager.MemoryInfo;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Paint;
-import android.net.Uri;
-import android.os.Environment;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SimpleCursorAdapter;

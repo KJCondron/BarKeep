@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 import android.view.View.OnTouchListener;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
