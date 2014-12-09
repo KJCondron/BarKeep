@@ -23,6 +23,5 @@
     </string-array>
 
     <string name="title_activity_full_screen_scroll">FullScreenScrollActivity</string>
-    <string name="hello_world">Hello world!</string>
 
 </resources>

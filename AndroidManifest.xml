@@ -105,6 +105,9 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.kjcondron.barkeep.MainActivity" />
+            <meta-data
+                android:name="android.app.default_searchable"
+                android:value=".SearchActivity" />
         </activity>
     </application>
 
