@@ -1,6 +1,7 @@
 package com.kjcondron.barkeep;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -12,6 +13,7 @@ import android.view.ViewGroup;
 import android.view.View.OnTouchListener;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -98,6 +100,7 @@ public abstract class DisplayFragment extends Fragment {
 		final AbsListView view = (AbsListView) rootView.findViewById(viewID);
 		view.setAdapter(adapter);
 		try{
+			final Context ctxt = getActivity(); 
 			view.setOnItemClickListener(new OnItemClickListener() {
 	        
 			public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
@@ -125,14 +128,22 @@ public abstract class DisplayFragment extends Fragment {
 	            int idx = parent.getFirstVisiblePosition();
 	            View top = parent.getChildAt(0);
 	            int offset = (top == null) ? 0 : v.getTop();
-	            //pager.getAdapter().notifyDataSetChanged();
-	            //setupView(inflater, container, gridView);
+	            try
+	            {
+	            	setupView(inflater, gridView);
+	            }
+	            catch(Exception e)
+				{
+					MainActivity.log_exception(ctxt, e, "Failed to update view");
+				}
+				pager.getAdapter().notifyDataSetChanged();
+	            
 	            // restore position
-	            /*if(!gridView)
+	            if(!gridView)
 	            {
 	            	ListView lv2 = (ListView) parent;
 	            	lv2.setSelectionFromTop(idx, offset);
-	            }*/
+	            }
 	            
 	        }
 		});
