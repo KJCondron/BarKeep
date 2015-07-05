@@ -1,7 +1,10 @@
 package com.kjcondron.barkeep;
 
+import java.io.InputStream;
+
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.view.View;
@@ -39,6 +42,7 @@ public class TypesAdapter extends SimpleCursorAdapter {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent)
 	{
+		try{
 		// in super
 		// calls newView to inflate view
 		// then bind view to populate
@@ -50,15 +54,36 @@ public class TypesAdapter extends SimpleCursorAdapter {
 			tv.setText("Scan");
 			
 			ImageView iv = (ImageView)nv.findViewById(mto[1]);
-			String loc = Environment.getExternalStorageDirectory().getAbsolutePath()+"/images/scan.jpg";			
-			iv.setImageURI(Uri.parse(loc));
-			
+			InputStream ims = mctxt.getAssets().open("images/scan.jpg");
+		    Drawable d = Drawable.createFromStream(ims, null);
+			iv.setImageDrawable(d);
 			v = nv;
 		}
 		else 
 			v = super.getView(position, convertView, parent);
 		
 		return v;
+		}
+		catch(Exception e)
+		{
+			return null;
+		}
 	}
-	 
+	
+	@Override
+	public void setViewImage(ImageView v, String value)
+	{
+		try{
+			String[] elems = value.split("/");
+			String name = elems[elems.length-1];
+			InputStream ims = mctxt.getAssets().open("images/" + name);
+		    Drawable d = Drawable.createFromStream(ims, null);
+			v.setImageDrawable(d);
+		}
+		catch(Exception ex)
+		{
+			super.setViewImage(v, value);
+		}
+		
+	} 
 }

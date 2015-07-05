@@ -10,6 +10,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
+import android.widget.Toast;
+
 import com.kjcondron.barkeep.SearchActivity.SrchTyp;
 import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 
@@ -23,6 +25,17 @@ public class DBHelper extends SQLiteAssetHelper  {
 	public DBHelper(Context ctxt) {
 		super(ctxt, DATABASE_NAME, null, DATABASE_VERSION);
 		m_context = ctxt;
+	}
+
+	public Cursor getTables()
+	{
+		SQLiteDatabase db = getReadableDatabase();
+
+		String sql = "SELECT name FROM sqlite_master";
+        Cursor c2 = db.rawQuery(sql, null);
+ 	   
+        c2.moveToFirst();
+        return c2;
 	}
 	
 	private String makeOptional(String name)
@@ -510,11 +523,10 @@ public class DBHelper extends SQLiteAssetHelper  {
 		close();
 		String dir = context.getApplicationInfo().dataDir + "/databases";
 		String path = dir +"/" + DATABASE_NAME;
-		String DEST = Environment.getExternalStorageDirectory().getAbsolutePath()+"/images/barkeep_db";
+		String DEST = Environment.getExternalStorageDirectory().getPath()+"/barkeep_db";
 		FileInputStream dbs = new FileInputStream(path);
 		File f = new File(DEST);
 		FileOutputStream ds = new FileOutputStream(f);
-		
 		byte[] buffer = new byte[1024];
         int length;
         while ((length = dbs.read(buffer))>0){

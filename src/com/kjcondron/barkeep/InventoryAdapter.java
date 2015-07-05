@@ -1,9 +1,12 @@
 package com.kjcondron.barkeep;
 
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
 import android.content.Context;
+import android.content.res.AssetManager;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -75,16 +78,16 @@ public class InventoryAdapter extends SimpleCursorAdapter {
 		String sText = cursor.getString(sizeColId);
 		String tText = cursor.getString(typeColId);
 		
-		String imagePath = "/storage/emulated/0/images/" + tText + ".jpg";
+		//String imagePath = "/storage/emulated/0/images/" + tText + ".jpg";
 		                    
 		float h = p.measureText(bText + pText);
 		setViewText(bv, bText);
 		setViewText(pv, pText);
 		setViewText(sv, sText);
-		safeSetImage(iv, imagePath);
+		safeSetImage(context, iv, tText);
 	}
 	
-	protected void safeSetImage(ImageView iv, String path)
+	protected void safeSetImage(Context context, ImageView iv, String path)
 	{
 		// TODO use bitmap decoder to size image and set it, or 
 		// maybe a LRU cache if we are going to allow image per
@@ -97,7 +100,8 @@ public class InventoryAdapter extends SimpleCursorAdapter {
 				Bitmap bm = null;
 				try
 				{
-					bm = decodeSampledBitmapFromPath(path, iv.getDrawable().getIntrinsicWidth(), iv.getDrawable().getIntrinsicHeight());
+					//bm = decodeSampledBitmapFromPath(path, iv.getDrawable().getIntrinsicWidth(), iv.getDrawable().getIntrinsicHeight());
+					bm = decodeSampledBitmapFromAssets(context, path, iv.getDrawable().getIntrinsicWidth(), iv.getDrawable().getIntrinsicHeight());
 				}
 				catch(OutOfMemoryError e)
 				{
@@ -150,6 +154,31 @@ public class InventoryAdapter extends SimpleCursorAdapter {
 	    // Decode bitmap with inSampleSize set
 	    options.inJustDecodeBounds = false;
 	    return BitmapFactory.decodeFile(path, options);
+	}
+	
+	public static Bitmap decodeSampledBitmapFromAssets(Context ctxt, String name, 
+	        int reqWidth, int reqHeight) {
+		try{
+		AssetManager assetMan = ctxt.getAssets( );
+		InputStream istr  = assetMan.open("images/" + name.toLowerCase() + ".jpg");
+        
+	    // First decode with inJustDecodeBounds=true to check dimensions
+	    final BitmapFactory.Options options = new BitmapFactory.Options();
+	    options.inJustDecodeBounds = true;
+	    BitmapFactory.decodeStream(istr, null, options);
+		
+	    // Calculate inSampleSize
+	    options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+
+	    // Decode bitmap with inSampleSize set
+	    options.inJustDecodeBounds = false;
+	    InputStream istr2  = assetMan.open("images/" + name.toLowerCase() + ".jpg");
+        return BitmapFactory.decodeStream(istr2, null, options);
+		}
+		catch(Exception e)
+		{
+			return null;
+		}
 	}
 
 }
